@@ -1,0 +1,364 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum PageType {
+  STANDARD
+  ARTICLES
+  LANDING
+  SERVICE
+  LEGAL
+}
+
+enum PageTemplate {
+  DEFAULT
+  ARTICLES_GRID
+  ARTICLES_LIST
+  ARTICLES_MAGAZINE
+  LANDING_CLEAN
+  SERVICE_MODERN
+  LEGAL_DEFAULT
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+  PDF
+  OTHER
+}
+
+enum MenuLocation {
+  TOP
+  FOOTER
+  SECONDARY
+}
+
+enum MenuItemType {
+  PAGE
+  CATEGORY
+  CUSTOM_LINK
+}
+
+enum ContactStatus {
+  NEW
+  READ
+  REPLIED
+  ARCHIVED
+}
+
+model Role {
+  id          BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  name        String           @unique @db.VarChar(100)
+  slug        String           @unique @db.VarChar(100)
+  description String?          @db.VarChar(500)
+  users       User[]
+  permissions RolePermission[]
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  @@map("roles")
+}
+
+model Permission {
+  id          BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  key         String           @unique @db.VarChar(150)
+  description String?          @db.VarChar(500)
+  roles       RolePermission[]
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       BigInt     @map("role_id") @db.UnsignedBigInt
+  permissionId BigInt     @map("permission_id") @db.UnsignedBigInt
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+model User {
+  id           BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  roleId       BigInt     @map("role_id") @db.UnsignedBigInt
+  email        String     @unique @db.VarChar(191)
+  passwordHash String     @map("password_hash") @db.VarChar(255)
+  name         String     @db.VarChar(191)
+  status       UserStatus @default(ACTIVE)
+  avatarId     BigInt?    @map("avatar_id") @db.UnsignedBigInt
+  lastLoginAt  DateTime?  @map("last_login_at")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @default(now()) @updatedAt @map("updated_at")
+
+  role         Role          @relation(fields: [roleId], references: [id])
+  avatar       Media?        @relation("UserAvatar", fields: [avatarId], references: [id], onDelete: SetNull)
+  pages        Page[]
+  posts        Post[]
+  mediaUploads Media[]       @relation("MediaUploader")
+  activityLogs ActivityLog[]
+
+  @@index([roleId])
+  @@index([avatarId])
+  @@map("users")
+}
+
+model Page {
+  id              BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  authorId        BigInt        @map("author_id") @db.UnsignedBigInt
+  title           String        @db.VarChar(191)
+  slug            String        @unique @db.VarChar(191)
+  status          ContentStatus @default(DRAFT)
+  pageType        PageType      @default(STANDARD) @map("page_type")
+  template        PageTemplate  @default(DEFAULT)
+  excerpt         String?       @db.Text
+  content         String?       @db.LongText
+  blocks          Json?
+  featuredMediaId BigInt?       @map("featured_media_id") @db.UnsignedBigInt
+  seoTitle        String?       @map("seo_title") @db.VarChar(191)
+  seoDescription  String?       @map("seo_description") @db.VarChar(500)
+  canonicalUrl    String?       @map("canonical_url") @db.VarChar(500)
+  noIndex         Boolean       @default(false) @map("no_index")
+  publishedAt     DateTime?     @map("published_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @default(now()) @updatedAt @map("updated_at")
+
+  author        User       @relation(fields: [authorId], references: [id])
+  featuredMedia Media?     @relation("PageFeaturedMedia", fields: [featuredMediaId], references: [id], onDelete: SetNull)
+  menuItems     MenuItem[]
+
+  @@index([authorId])
+  @@index([featuredMediaId])
+  @@index([status, publishedAt])
+  @@index([pageType])
+  @@map("pages")
+}
+
+model Category {
+  id          BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  name        String     @db.VarChar(191)
+  slug        String     @unique @db.VarChar(191)
+  description String?    @db.Text
+  posts       Post[]
+  menuItems   MenuItem[]
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @default(now()) @updatedAt @map("updated_at")
+
+  @@map("categories")
+}
+
+model Tag {
+  id        BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name      String    @db.VarChar(191)
+  slug      String    @unique @db.VarChar(191)
+  posts     PostTag[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@map("tags")
+}
+
+model Post {
+  id               BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  authorId         BigInt        @map("author_id") @db.UnsignedBigInt
+  categoryId       BigInt?       @map("category_id") @db.UnsignedBigInt
+  title            String        @db.VarChar(191)
+  slug             String        @unique @db.VarChar(191)
+  status           ContentStatus @default(DRAFT)
+  excerpt          String?       @db.Text
+  content          String?       @db.LongText
+  featuredMediaId  BigInt?       @map("featured_media_id") @db.UnsignedBigInt
+  secondaryMediaId BigInt?       @map("secondary_media_id") @db.UnsignedBigInt
+  seoTitle         String?       @map("seo_title") @db.VarChar(191)
+  seoDescription   String?       @map("seo_description") @db.VarChar(500)
+  canonicalUrl     String?       @map("canonical_url") @db.VarChar(500)
+  noIndex          Boolean       @default(false) @map("no_index")
+  publishedAt      DateTime?     @map("published_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @default(now()) @updatedAt @map("updated_at")
+
+  author         User              @relation(fields: [authorId], references: [id])
+  category       Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  featuredMedia  Media?            @relation("PostFeaturedMedia", fields: [featuredMediaId], references: [id], onDelete: SetNull)
+  secondaryMedia Media?            @relation("PostSecondaryMedia", fields: [secondaryMediaId], references: [id], onDelete: SetNull)
+  gallery        PostGalleryItem[]
+  tags           PostTag[]
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([featuredMediaId])
+  @@index([secondaryMediaId])
+  @@index([status, publishedAt])
+  @@map("posts")
+}
+
+model PostTag {
+  postId    BigInt   @map("post_id") @db.UnsignedBigInt
+  tagId     BigInt   @map("tag_id") @db.UnsignedBigInt
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@id([postId, tagId])
+  @@index([tagId])
+  @@map("post_tags")
+}
+
+model PostGalleryItem {
+  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  postId    BigInt   @map("post_id") @db.UnsignedBigInt
+  mediaId   BigInt   @map("media_id") @db.UnsignedBigInt
+  sortOrder Int      @default(0) @map("sort_order")
+  caption   String?  @db.VarChar(500)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  media     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([postId, mediaId])
+  @@index([postId, sortOrder])
+  @@index([mediaId])
+  @@map("post_gallery_items")
+}
+
+model Media {
+  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  uploadedById BigInt    @map("uploaded_by_id") @db.UnsignedBigInt
+  type         MediaType
+  filename     String    @db.VarChar(255)
+  originalName String    @map("original_name") @db.VarChar(255)
+  path         String    @db.VarChar(700)
+  url          String    @db.VarChar(700)
+  mimeType     String    @map("mime_type") @db.VarChar(100)
+  extension    String?   @db.VarChar(20)
+  sizeBytes    BigInt    @map("size_bytes") @db.UnsignedBigInt
+  width        Int?
+  height       Int?
+  altText      String?   @map("alt_text") @db.VarChar(255)
+  caption      String?   @db.VarChar(500)
+  folder       String?   @db.VarChar(255)
+  checksum     String?   @db.VarChar(128)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  uploadedBy       User              @relation("MediaUploader", fields: [uploadedById], references: [id])
+  userAvatars      User[]            @relation("UserAvatar")
+  pageFeatured     Page[]            @relation("PageFeaturedMedia")
+  postFeatured     Post[]            @relation("PostFeaturedMedia")
+  postSecondary    Post[]            @relation("PostSecondaryMedia")
+  postGalleryItems PostGalleryItem[]
+
+  @@index([uploadedById])
+  @@index([type])
+  @@index([folder])
+  @@map("media")
+}
+
+model Menu {
+  id        BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  name      String        @db.VarChar(191)
+  slug      String        @unique @db.VarChar(191)
+  location  MenuLocation? @unique
+  items     MenuItem[]
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @default(now()) @updatedAt @map("updated_at")
+
+  @@map("menus")
+}
+
+model MenuItem {
+  id           BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  menuId       BigInt       @map("menu_id") @db.UnsignedBigInt
+  parentId     BigInt?      @map("parent_id") @db.UnsignedBigInt
+  type         MenuItemType @default(CUSTOM_LINK)
+  pageId       BigInt?      @map("page_id") @db.UnsignedBigInt
+  categoryId   BigInt?      @map("category_id") @db.UnsignedBigInt
+  label        String       @db.VarChar(191)
+  url          String?      @db.VarChar(700)
+  sortOrder    Int          @default(0) @map("sort_order")
+  openInNewTab Boolean      @default(false) @map("open_in_new_tab")
+  isEnabled    Boolean      @default(true) @map("is_enabled")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @default(now()) @updatedAt @map("updated_at")
+
+  menu     Menu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  page     Page?      @relation(fields: [pageId], references: [id], onDelete: SetNull)
+  category Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  parent   MenuItem?  @relation("MenuItemChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children MenuItem[] @relation("MenuItemChildren")
+
+  @@index([menuId, sortOrder])
+  @@index([parentId])
+  @@index([pageId])
+  @@index([categoryId])
+  @@map("menu_items")
+}
+
+model Setting {
+  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  key       String   @unique @db.VarChar(191)
+  value     Json?
+  group     String   @default("general") @db.VarChar(100)
+  isPublic  Boolean  @default(false) @map("is_public")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([group])
+  @@map("settings")
+}
+
+model ContactMessage {
+  id        BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  name      String        @db.VarChar(191)
+  email     String        @db.VarChar(191)
+  phone     String?       @db.VarChar(100)
+  subject   String?       @db.VarChar(255)
+  message   String        @db.Text
+  status    ContactStatus @default(NEW)
+  ipAddress String?       @map("ip_address") @db.VarChar(64)
+  userAgent String?       @map("user_agent") @db.VarChar(500)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @default(now()) @updatedAt @map("updated_at")
+
+  @@index([status, createdAt])
+  @@map("contact_messages")
+}
+
+model ActivityLog {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  userId     BigInt?  @map("user_id") @db.UnsignedBigInt
+  action     String   @db.VarChar(150)
+  entityType String?  @map("entity_type") @db.VarChar(100)
+  entityId   String?  @map("entity_id") @db.VarChar(191)
+  metadata   Json?
+  ipAddress  String?  @map("ip_address") @db.VarChar(64)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("activity_logs")
+}
