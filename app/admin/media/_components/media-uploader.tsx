@@ -5,7 +5,15 @@ import { useRouter } from "next/navigation";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-export function MediaUploader() {
+type Props = {
+  libraries: string[];
+  selectedLibrary: string;
+};
+
+export function MediaUploader({
+  libraries,
+  selectedLibrary,
+}: Props) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -35,7 +43,6 @@ export function MediaUploader() {
 
       const result = (await response.json()) as {
         error?: string;
-        media?: { id: string };
       };
 
       if (!response.ok) {
@@ -57,93 +64,73 @@ export function MediaUploader() {
     <form
       ref={formRef}
       action={upload}
-      className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm"
+      className="grid gap-3 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm lg:grid-cols-[240px_minmax(0,1fr)]"
     >
-      <div>
-        <h2 className="text-lg font-bold text-zinc-950">
-          Upload media
-        </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          JPEG, PNG, WebP, GIF or AVIF · max 10 MB
-        </p>
-      </div>
+      <label className="block">
+        <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          Upload to
+        </span>
+        <select
+          name="folder"
+          defaultValue={selectedLibrary}
+          className="mt-2 w-full rounded-xl border border-zinc-300 bg-white px-3 py-3 text-sm font-medium"
+        >
+          {libraries.map((library) => (
+            <option key={library} value={library}>
+              {library}
+            </option>
+          ))}
+        </select>
+      </label>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <label className="md:col-span-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            Image
-          </span>
+      <div className="rounded-xl border border-dashed border-zinc-300 bg-zinc-50 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-zinc-900">
+              Choose an image to upload
+            </p>
+            <p className="mt-1 text-xs text-zinc-500">
+              JPG, PNG, WebP, GIF or AVIF · max 10 MB
+            </p>
+          </div>
+
           <input
             name="file"
             type="file"
             accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
             required
-            className="mt-2 block w-full rounded-xl border border-zinc-300 bg-white p-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-zinc-950 file:px-3 file:py-2 file:font-semibold file:text-white"
+            className="max-w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-zinc-950 file:px-3 file:py-2 file:font-semibold file:text-white"
           />
-        </label>
+        </div>
 
-        <label>
-          <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            Alt text
-          </span>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
           <input
             name="altText"
             maxLength={255}
-            className="mt-2 w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-sm"
+            placeholder="Alt text"
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
           />
-        </label>
-
-        <label>
-          <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            Folder
-          </span>
-          <input
-            name="folder"
-            maxLength={255}
-            list="sira-media-folders"
-            defaultValue="misc"
-            placeholder="pages, posts, gallery..."
-            className="mt-2 w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-sm"
-          />
-          <datalist id="sira-media-folders">
-            <option value="pages" />
-            <option value="posts" />
-            <option value="gallery" />
-            <option value="users" />
-            <option value="branding" />
-            <option value="misc" />
-          </datalist>
-          <span className="mt-1 block text-[11px] text-zinc-400">
-            Stored physically as folder / year / month / file.
-          </span>
-        </label>
-
-        <label className="md:col-span-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            Caption
-          </span>
           <input
             name="caption"
             maxLength={500}
-            className="mt-2 w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-sm"
+            placeholder="Caption"
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
           />
-        </label>
-      </div>
+        </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button
-          type="submit"
-          disabled={uploading}
-          className="rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
-        >
-          {uploading ? "Uploading..." : "Upload image"}
-        </button>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <button
+            type="submit"
+            disabled={uploading}
+            className="rounded-lg bg-zinc-950 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          >
+            {uploading ? "Uploading..." : "Upload"}
+          </button>
 
-        {message ? (
-          <span className="text-sm text-zinc-600">
-            {message}
-          </span>
-        ) : null}
+          {message ? (
+            <span className="text-xs text-zinc-500">{message}</span>
+          ) : null}
+        </div>
       </div>
     </form>
   );
