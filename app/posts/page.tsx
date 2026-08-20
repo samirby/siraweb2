@@ -30,6 +30,68 @@ export default async function PublicPostsPage({
   const category = (query.category ?? "").trim();
   const tag = (query.tag ?? "").trim();
   const currentPage = safePage(query.page);
+  const now = new Date();
+
+  /*
+   * Resolve text search against categories and tags first.
+   * This avoids a fragile deeply nested OR filter and also means
+   * typing "Kosova" can find a post whose tag is "Kosova".
+   */
+  const [matchingCategories, matchingTags] = q
+    ? await Promise.all([
+        prisma.category.findMany({
+          where: {
+            OR: [
+              { name: { contains: q } },
+              { slug: { contains: q } },
+            ],
+          },
+          select: {
+            id: true,
+          },
+          take: 50,
+        }),
+
+        prisma.tag.findMany({
+          where: {
+            OR: [
+              { name: { contains: q } },
+              { slug: { contains: q } },
+            ],
+          },
+          select: {
+            id: true,
+          },
+          take: 50,
+        }),
+      ])
+    : [[], []];
+
+  const matchingCategoryIds = matchingCategories.map((item) => item.id);
+  const matchingTagIds = matchingTags.map((item) => item.id);
+
+  const searchOr = q
+    ? [
+        { title: { contains: q } },
+        { excerpt: { contains: q } },
+        ...(matchingCategoryIds.length
+          ? [{ categoryId: { in: matchingCategoryIds } }]
+          : []),
+        ...(matchingTagIds.length
+          ? [
+              {
+                tags: {
+                  some: {
+                    tagId: {
+                      in: matchingTagIds,
+                    },
+                  },
+                },
+              },
+            ]
+          : []),
+      ]
+    : [];
 
   const where = {
     status: "PUBLISHED" as const,
@@ -37,19 +99,18 @@ export default async function PublicPostsPage({
       {
         OR: [
           { publishedAt: null },
-          { publishedAt: { lte: new Date() } },
+          { publishedAt: { lte: now } },
         ],
       },
+
       ...(q
         ? [
             {
-              OR: [
-                { title: { contains: q } },
-                { excerpt: { contains: q } },
-              ],
+              OR: searchOr,
             },
           ]
         : []),
+
       ...(category
         ? [
             {
@@ -59,6 +120,7 @@ export default async function PublicPostsPage({
             },
           ]
         : []),
+
       ...(tag
         ? [
             {
@@ -100,7 +162,9 @@ export default async function PublicPostsPage({
       },
     }),
 
-    prisma.post.count({ where }),
+    prisma.post.count({
+      where,
+    }),
 
     prisma.category.findMany({
       orderBy: {
@@ -155,7 +219,7 @@ export default async function PublicPostsPage({
             </h1>
 
             <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600">
-              Browse published articles by category, tag or search.
+              Search articles by title, excerpt, category or tag.
             </p>
           </header>
 
@@ -166,7 +230,7 @@ export default async function PublicPostsPage({
             <input
               name="q"
               defaultValue={q}
-              placeholder="Search posts..."
+              placeholder="Search title, category or tag..."
               className="w-full rounded-xl border border-zinc-300 px-4 py-3 text-sm"
             />
 
@@ -202,11 +266,11 @@ export default async function PublicPostsPage({
               type="submit"
               className="rounded-xl bg-zinc-950 px-5 py-3 text-sm font-semibold text-white"
             >
-              Filter
+              Search
             </button>
           </form>
 
-          {(q || category || tag) ? (
+          {q || category || tag ? (
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm text-zinc-500">
                 {total} result(s)
