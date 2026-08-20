@@ -11,18 +11,27 @@ type PageFormValue = {
   seoDescription?: string | null;
   canonicalUrl?: string | null;
   noIndex?: boolean;
+  featuredMediaId?: string | null;
 };
 
 type Props = {
   action: (formData: FormData) => void | Promise<void>;
   value?: PageFormValue;
   submitLabel: string;
+  media?: Array<{
+    id: string;
+    url: string;
+    originalName: string;
+    altText: string | null;
+    folder: string | null;
+  }>;
 };
 
 export function PageForm({
   action,
   value,
   submitLabel,
+  media = [],
 }: Props) {
   return (
     <form action={action} className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
@@ -157,6 +166,39 @@ export function PageForm({
           >
             {submitLabel}
           </button>
+        </section>
+
+        <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-bold text-zinc-950">Featured image</h2>
+
+          <select
+            name="featuredMediaId"
+            defaultValue={value?.featuredMediaId ?? ""}
+            className="mt-4 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm"
+          >
+            <option value="">No featured image</option>
+            {media.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.originalName}
+                {item.folder ? ` — ${item.folder}` : ""}
+              </option>
+            ))}
+          </select>
+
+          {value?.featuredMediaId ? (
+            <div className="mt-4">
+              {media
+                .filter((item) => item.id === value.featuredMediaId)
+                .map((item) => (
+                  <img
+                    key={item.id}
+                    src={item.url}
+                    alt={item.altText || item.originalName}
+                    className="aspect-[16/9] w-full rounded-xl border border-zinc-200 object-cover"
+                  />
+                ))}
+            </div>
+          ) : null}
         </section>
 
         <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">

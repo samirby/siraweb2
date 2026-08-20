@@ -7,8 +7,8 @@ import {
   deletePageAction,
   togglePagePublishAction,
   updatePageAction,
-} from "../../actions";
-import { PageForm } from "../../_components/page-form";
+} from "@/app/admin/pages/actions";
+import { PageForm } from "@/app/admin/pages/_components/page-form";
 
 export const dynamic = "force-dynamic";
 
@@ -34,9 +34,28 @@ export default async function EditPagePage({
     notFound();
   }
 
-  const page = await prisma.page.findUnique({
-    where: { id },
-  });
+  const [page, media] = await Promise.all([
+    prisma.page.findUnique({
+      where: { id },
+    }),
+
+    prisma.media.findMany({
+      where: {
+        type: "IMAGE",
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        url: true,
+        originalName: true,
+        altText: true,
+        folder: true,
+      },
+      take: 300,
+    }),
+  ]);
 
   if (!page) {
     notFound();
@@ -52,9 +71,11 @@ export default async function EditPagePage({
           >
             ← Pages
           </Link>
+
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-zinc-950">
             Edit Page
           </h1>
+
           <p className="mt-1 text-sm text-zinc-500">
             /{page.slug}
           </p>
@@ -72,17 +93,27 @@ export default async function EditPagePage({
           ) : null}
 
           <form action={togglePagePublishAction}>
-            <input type="hidden" name="id" value={page.id.toString()} />
+            <input
+              type="hidden"
+              name="id"
+              value={page.id.toString()}
+            />
             <button
               type="submit"
               className="rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700"
             >
-              {page.status === "PUBLISHED" ? "Unpublish" : "Publish"}
+              {page.status === "PUBLISHED"
+                ? "Unpublish"
+                : "Publish"}
             </button>
           </form>
 
           <form action={deletePageAction}>
-            <input type="hidden" name="id" value={page.id.toString()} />
+            <input
+              type="hidden"
+              name="id"
+              value={page.id.toString()}
+            />
             <button
               type="submit"
               className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700"
@@ -102,6 +133,10 @@ export default async function EditPagePage({
       <PageForm
         action={updatePageAction}
         submitLabel="Save changes"
+        media={media.map((item) => ({
+          ...item,
+          id: item.id.toString(),
+        }))}
         value={{
           id: page.id.toString(),
           title: page.title,
@@ -115,6 +150,8 @@ export default async function EditPagePage({
           seoDescription: page.seoDescription,
           canonicalUrl: page.canonicalUrl,
           noIndex: page.noIndex,
+          featuredMediaId:
+            page.featuredMediaId?.toString() ?? null,
         }}
       />
     </main>

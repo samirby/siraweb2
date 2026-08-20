@@ -105,6 +105,10 @@ function pageDataFromForm(formData: FormData) {
     seoDescription: optionalText(formData, "seoDescription"),
     canonicalUrl: optionalText(formData, "canonicalUrl"),
     noIndex: formData.get("noIndex") === "on",
+    featuredMediaId: (() => {
+      const value = text(formData, "featuredMediaId");
+      return value ? BigInt(value) : null;
+    })(),
   };
 }
 
@@ -127,6 +131,7 @@ export async function createPageAction(formData: FormData) {
       seoDescription: data.seoDescription,
       canonicalUrl: data.canonicalUrl,
       noIndex: data.noIndex,
+      featuredMediaId: data.featuredMediaId,
       publishedAt: data.status === "PUBLISHED" ? new Date() : null,
     },
   });
@@ -183,6 +188,7 @@ export async function updatePageAction(formData: FormData) {
       seoDescription: data.seoDescription,
       canonicalUrl: data.canonicalUrl,
       noIndex: data.noIndex,
+      featuredMediaId: data.featuredMediaId,
       publishedAt:
         data.status === "PUBLISHED"
           ? existing.publishedAt ?? new Date()
