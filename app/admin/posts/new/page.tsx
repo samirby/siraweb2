@@ -10,8 +10,16 @@ export const dynamic = "force-dynamic";
 export default async function NewPostPage() {
   await requirePermission("posts.create");
 
-  const [categories, media] = await Promise.all([
+  const [categories, tags, media] = await Promise.all([
     prisma.category.findMany({
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+      },
+    }),
+
+    prisma.tag.findMany({
       orderBy: { name: "asc" },
       select: {
         id: true,
@@ -52,6 +60,10 @@ export default async function NewPostPage() {
         action={createPostAction}
         submitLabel="Create post"
         categories={categories.map((item) => ({
+          id: item.id.toString(),
+          name: item.name,
+        }))}
+        tags={tags.map((item) => ({
           id: item.id.toString(),
           name: item.name,
         }))}

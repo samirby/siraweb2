@@ -7,6 +7,11 @@ type CategoryOption = {
   name: string;
 };
 
+type TagOption = {
+  id: string;
+  name: string;
+};
+
 type MediaOption = {
   id: string;
   url: string;
@@ -30,12 +35,14 @@ type PostValue = {
   featuredMediaId?: string | null;
   secondaryMediaId?: string | null;
   galleryMediaIds?: string[];
+  tagIds?: string[];
 };
 
 type Props = {
   action: (formData: FormData) => void | Promise<void>;
   submitLabel: string;
   categories: CategoryOption[];
+  tags: TagOption[];
   media: MediaOption[];
   value?: PostValue;
 };
@@ -44,6 +51,7 @@ export function PostForm({
   action,
   submitLabel,
   categories,
+  tags,
   media,
   value,
 }: Props) {
@@ -224,6 +232,34 @@ export function PostForm({
                 </option>
               ))}
             </select>
+          </section>
+
+          <section className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-sm font-bold text-zinc-950">
+                Tags
+              </h2>
+              <span className="text-[11px] text-zinc-400">
+                Multiple
+              </span>
+            </div>
+
+            <select
+              name="tagIds"
+              multiple
+              defaultValue={value?.tagIds ?? []}
+              className="mt-3 h-32 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
+            >
+              {tags.map((tag) => (
+                <option key={tag.id} value={tag.id}>
+                  {tag.name}
+                </option>
+              ))}
+            </select>
+
+            <p className="mt-2 text-[11px] text-zinc-400">
+              Hold Ctrl/Cmd to select multiple tags.
+            </p>
           </section>
 
           <PostMediaField

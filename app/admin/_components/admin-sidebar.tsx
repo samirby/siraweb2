@@ -12,7 +12,14 @@ export function AdminSidebar() {
 
   useEffect(() => {
     const stored = window.localStorage.getItem("sira-admin-sidebar-collapsed");
-    setCollapsed(stored === "true");
+    const isCollapsed = stored === "true";
+
+    setCollapsed(isCollapsed);
+
+    document.documentElement.style.setProperty(
+      "--sira-admin-sidebar-width",
+      isCollapsed ? "5rem" : "16rem",
+    );
   }, []);
 
   function toggleSidebar() {
@@ -22,13 +29,21 @@ export function AdminSidebar() {
         "sira-admin-sidebar-collapsed",
         String(next),
       );
+
+      document.documentElement.style.setProperty(
+        "--sira-admin-sidebar-width",
+        next ? "5rem" : "16rem",
+      );
+
       return next;
     });
   }
 
   return (
     <aside
-      className="sticky top-0 hidden h-dvh w-64 shrink-0 self-start flex-col overflow-y-auto overflow-x-hidden bg-zinc-950 text-white shadow-xl lg:flex relative z-10"
+      className={`sticky top-0 hidden h-dvh shrink-0 self-start flex-col overflow-y-auto overflow-x-hidden bg-zinc-950 text-white shadow-xl transition-[width] duration-200 lg:flex relative z-10 ${
+        collapsed ? "w-20" : "w-64"
+      }`}
     >
       <div className="flex h-full flex-col">
         <div

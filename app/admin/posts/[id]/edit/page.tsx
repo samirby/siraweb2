@@ -31,7 +31,7 @@ export default async function EditPostPage({
     notFound();
   }
 
-  const [post, categories, media] = await Promise.all([
+  const [post, categories, tags, media] = await Promise.all([
     prisma.post.findUnique({
       where: { id },
       include: {
@@ -41,10 +41,23 @@ export default async function EditPostPage({
             mediaId: true,
           },
         },
+        tags: {
+          select: {
+            tagId: true,
+          },
+        },
       },
     }),
 
     prisma.category.findMany({
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+      },
+    }),
+
+    prisma.tag.findMany({
       orderBy: { name: "asc" },
       select: {
         id: true,
@@ -132,6 +145,10 @@ export default async function EditPostPage({
           id: item.id.toString(),
           name: item.name,
         }))}
+        tags={tags.map((item) => ({
+          id: item.id.toString(),
+          name: item.name,
+        }))}
         media={media.map((item) => ({
           ...item,
           id: item.id.toString(),
@@ -154,6 +171,9 @@ export default async function EditPostPage({
             post.secondaryMediaId?.toString() ?? null,
           galleryMediaIds: post.gallery.map((item) =>
             item.mediaId.toString(),
+          ),
+          tagIds: post.tags.map((item) =>
+            item.tagId.toString(),
           ),
         }}
       />

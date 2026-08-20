@@ -91,6 +91,11 @@ function postDataFromForm(formData: FormData) {
       .map((value) => String(value).trim())
       .filter(Boolean)
       .map((value) => BigInt(value)),
+    tagIds: formData
+      .getAll("tagIds")
+      .map((value) => String(value).trim())
+      .filter(Boolean)
+      .map((value) => BigInt(value)),
   };
 }
 
@@ -111,6 +116,24 @@ async function replaceGallery(
       postId,
       mediaId,
       sortOrder: index,
+    })),
+  });
+}
+
+async function replaceTags(
+  postId: bigint,
+  tagIds: bigint[],
+) {
+  await prisma.postTag.deleteMany({
+    where: { postId },
+  });
+
+  if (!tagIds.length) return;
+
+  await prisma.postTag.createMany({
+    data: tagIds.map((tagId) => ({
+      postId,
+      tagId,
     })),
   });
 }
@@ -140,6 +163,7 @@ export async function createPostAction(formData: FormData) {
   });
 
   await replaceGallery(post.id, data.galleryMediaIds);
+  await replaceTags(post.id, data.tagIds);
 
   await prisma.activityLog.create({
     data: {
@@ -204,6 +228,7 @@ export async function updatePostAction(formData: FormData) {
   });
 
   await replaceGallery(id, data.galleryMediaIds);
+  await replaceTags(id, data.tagIds);
 
   await prisma.activityLog.create({
     data: {
