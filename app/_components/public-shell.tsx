@@ -1,5 +1,7 @@
 import Link from "next/link";
+
 import { prisma } from "@/lib/db/prisma";
+import { PublicMobileNav } from "./public-mobile-nav";
 
 function itemHref(item: {
   type: "PAGE" | "CATEGORY" | "CUSTOM_LINK";
@@ -27,21 +29,25 @@ export async function PublicShell({
     prisma.setting.findUnique({
       where: { key: "site.name" },
     }),
+
     prisma.menu.findMany({
       where: {
         location: {
           in: ["TOP", "FOOTER", "SECONDARY"],
         },
       },
+
       include: {
         items: {
           where: {
             isEnabled: true,
           },
+
           orderBy: [
             { sortOrder: "asc" },
             { id: "asc" },
           ],
+
           include: {
             page: {
               select: {
@@ -49,6 +55,7 @@ export async function PublicShell({
                 status: true,
               },
             },
+
             category: {
               select: {
                 slug: true,
@@ -73,10 +80,26 @@ export async function PublicShell({
     (menu) => menu.location === "FOOTER",
   );
 
+  const topItems =
+    topMenu?.items.map((item) => ({
+      id: item.id.toString(),
+      label: item.label,
+      href: itemHref(item),
+      openInNewTab: item.openInNewTab,
+    })) ?? [];
+
+  const secondaryItems =
+    secondaryMenu?.items.map((item) => ({
+      id: item.id.toString(),
+      label: item.label,
+      href: itemHref(item),
+      openInNewTab: item.openInNewTab,
+    })) ?? [];
+
   return (
     <div className="min-h-screen bg-white text-zinc-950">
       {secondaryMenu?.items.length ? (
-        <div className="border-b border-zinc-800 bg-zinc-950 text-zinc-300">
+        <div className="hidden border-b border-zinc-800 bg-zinc-950 text-zinc-300 md:block">
           <div className="mx-auto flex min-h-9 max-w-7xl items-center justify-end gap-4 px-4 text-xs sm:px-6 lg:px-8">
             {secondaryMenu.items.map((item) => (
               <Link
@@ -113,6 +136,12 @@ export async function PublicShell({
               </Link>
             ))}
           </nav>
+
+          <PublicMobileNav
+            siteName={siteName}
+            topItems={topItems}
+            secondaryItems={secondaryItems}
+          />
         </div>
       </header>
 

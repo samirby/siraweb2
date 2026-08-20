@@ -51,6 +51,7 @@ export default async function EditMenuPage({
         },
       },
     }),
+
     prisma.page.findMany({
       where: {
         status: "PUBLISHED",
@@ -64,6 +65,7 @@ export default async function EditMenuPage({
         slug: true,
       },
     }),
+
     prisma.category.findMany({
       orderBy: {
         name: "asc",
@@ -71,7 +73,6 @@ export default async function EditMenuPage({
       select: {
         id: true,
         name: true,
-        slug: true,
       },
     }),
   ]);
@@ -80,7 +81,7 @@ export default async function EditMenuPage({
 
   return (
     <main className="px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
         <div>
           <Link
             href="/admin/menus"
@@ -88,150 +89,128 @@ export default async function EditMenuPage({
           >
             ← Menus
           </Link>
+
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-zinc-950">
             {menu.name}
           </h1>
+
           <p className="mt-1 text-sm text-zinc-500">
             {menu.location ?? "Custom menu"} · /{menu.slug}
           </p>
         </div>
 
         <form action={deleteMenuAction}>
-          <input type="hidden" name="id" value={menu.id.toString()} />
+          <input
+            type="hidden"
+            name="id"
+            value={menu.id.toString()}
+          />
+
           <button
             type="submit"
-            className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700"
+            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700"
           >
             Delete menu
           </button>
         </form>
       </div>
 
-      {query.saved === "1" ? (
-        <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
-          Menu saved.
+      {query.saved === "1" ||
+      query.itemAdded === "1" ||
+      query.itemSaved === "1" ? (
+        <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-medium text-emerald-700">
+          Changes saved successfully.
         </div>
       ) : null}
 
-      {query.itemAdded === "1" ? (
-        <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
-          Menu item added.
-        </div>
-      ) : null}
-
-      {query.itemSaved === "1" ? (
-        <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
-          Menu item saved.
-        </div>
-      ) : null}
-
-      <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
-        <div className="space-y-6">
-          <form
-            action={updateMenuAction}
-            className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm"
-          >
-            <input type="hidden" name="id" value={menu.id.toString()} />
-
-            <h2 className="text-lg font-bold text-zinc-950">
+      <div className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)]">
+        <div className="space-y-4">
+          <details className="rounded-2xl border border-zinc-200 bg-white shadow-sm" open>
+            <summary className="cursor-pointer list-none px-4 py-3 font-semibold text-zinc-950">
               Menu settings
-            </h2>
+            </summary>
 
-            <label className="mt-5 block">
-              <span className="text-sm font-semibold text-zinc-800">
-                Name
-              </span>
+            <form
+              action={updateMenuAction}
+              className="space-y-3 border-t border-zinc-100 p-4"
+            >
+              <input
+                type="hidden"
+                name="id"
+                value={menu.id.toString()}
+              />
+
               <input
                 name="name"
                 required
                 defaultValue={menu.name}
-                className="mt-2 w-full rounded-xl border border-zinc-300 px-4 py-3 outline-none focus:border-zinc-950"
+                placeholder="Menu name"
+                className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
               />
-            </label>
 
-            <label className="mt-5 block">
-              <span className="text-sm font-semibold text-zinc-800">
-                Slug
-              </span>
               <input
                 name="slug"
                 defaultValue={menu.slug}
-                className="mt-2 w-full rounded-xl border border-zinc-300 px-4 py-3 outline-none focus:border-zinc-950"
+                placeholder="menu-slug"
+                className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
               />
-            </label>
 
-            <label className="mt-5 block">
-              <span className="text-sm font-semibold text-zinc-800">
-                Location
-              </span>
               <select
                 name="location"
                 defaultValue={menu.location ?? ""}
-                className="mt-2 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3"
+                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
               >
                 <option value="">Custom / unassigned</option>
                 <option value="TOP">Top Menu</option>
                 <option value="FOOTER">Footer Menu</option>
                 <option value="SECONDARY">Secondary Menu</option>
               </select>
-            </label>
 
-            <button
-              type="submit"
-              className="mt-5 w-full rounded-xl bg-zinc-950 px-4 py-3 text-sm font-semibold text-white"
+              <button
+                type="submit"
+                className="w-full rounded-lg bg-zinc-950 px-3 py-2 text-sm font-semibold text-white"
+              >
+                Save menu
+              </button>
+            </form>
+          </details>
+
+          <details className="rounded-2xl border border-zinc-200 bg-white shadow-sm">
+            <summary className="cursor-pointer list-none px-4 py-3 font-semibold text-zinc-950">
+              + Add menu item
+            </summary>
+
+            <form
+              action={addMenuItemAction}
+              className="space-y-3 border-t border-zinc-100 p-4"
             >
-              Save menu
-            </button>
-          </form>
+              <input
+                type="hidden"
+                name="menuId"
+                value={menu.id.toString()}
+              />
 
-          <form
-            action={addMenuItemAction}
-            className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm"
-          >
-            <input
-              type="hidden"
-              name="menuId"
-              value={menu.id.toString()}
-            />
-
-            <h2 className="text-lg font-bold text-zinc-950">
-              Add menu item
-            </h2>
-
-            <label className="mt-5 block">
-              <span className="text-sm font-semibold text-zinc-800">
-                Type
-              </span>
               <select
                 name="type"
                 defaultValue="PAGE"
-                className="mt-2 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3"
+                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
               >
                 <option value="PAGE">Published page</option>
                 <option value="CATEGORY">Category</option>
                 <option value="CUSTOM_LINK">Custom link</option>
               </select>
-            </label>
 
-            <label className="mt-5 block">
-              <span className="text-sm font-semibold text-zinc-800">
-                Label
-              </span>
               <input
                 name="label"
                 required
-                className="mt-2 w-full rounded-xl border border-zinc-300 px-4 py-3"
+                placeholder="Menu label"
+                className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
               />
-            </label>
 
-            <label className="mt-5 block">
-              <span className="text-sm font-semibold text-zinc-800">
-                Page
-              </span>
               <select
                 name="pageId"
                 defaultValue=""
-                className="mt-2 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3"
+                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
               >
                 <option value="">Select page</option>
                 {pages.map((page) => (
@@ -239,20 +218,15 @@ export default async function EditMenuPage({
                     key={page.id.toString()}
                     value={page.id.toString()}
                   >
-                    {page.title} (/{page.slug})
+                    {page.title}
                   </option>
                 ))}
               </select>
-            </label>
 
-            <label className="mt-5 block">
-              <span className="text-sm font-semibold text-zinc-800">
-                Category
-              </span>
               <select
                 name="categoryId"
                 defaultValue=""
-                className="mt-2 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3"
+                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
               >
                 <option value="">Select category</option>
                 {categories.map((category) => (
@@ -264,27 +238,17 @@ export default async function EditMenuPage({
                   </option>
                 ))}
               </select>
-            </label>
 
-            <label className="mt-5 block">
-              <span className="text-sm font-semibold text-zinc-800">
-                Custom URL
-              </span>
               <input
                 name="url"
-                placeholder="https://... or /path"
-                className="mt-2 w-full rounded-xl border border-zinc-300 px-4 py-3"
+                placeholder="Custom URL"
+                className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
               />
-            </label>
 
-            <label className="mt-5 block">
-              <span className="text-sm font-semibold text-zinc-800">
-                Parent item
-              </span>
               <select
                 name="parentId"
                 defaultValue=""
-                className="mt-2 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3"
+                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
               >
                 <option value="">No parent</option>
                 {menu.items.map((item) => (
@@ -296,114 +260,123 @@ export default async function EditMenuPage({
                   </option>
                 ))}
               </select>
-            </label>
 
-            <label className="mt-5 block">
-              <span className="text-sm font-semibold text-zinc-800">
-                Sort order
-              </span>
               <input
                 name="sortOrder"
                 type="number"
                 defaultValue={menu.items.length}
-                className="mt-2 w-full rounded-xl border border-zinc-300 px-4 py-3"
+                className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
               />
-            </label>
 
-            <label className="mt-5 flex items-center gap-3">
-              <input
-                name="isEnabled"
-                type="checkbox"
-                defaultChecked
-                className="h-4 w-4"
-              />
-              <span className="text-sm font-medium text-zinc-700">
-                Enabled
-              </span>
-            </label>
+              <div className="flex flex-wrap gap-4 text-sm">
+                <label className="flex items-center gap-2">
+                  <input
+                    name="isEnabled"
+                    type="checkbox"
+                    defaultChecked
+                  />
+                  Enabled
+                </label>
 
-            <label className="mt-3 flex items-center gap-3">
-              <input
-                name="openInNewTab"
-                type="checkbox"
-                className="h-4 w-4"
-              />
-              <span className="text-sm font-medium text-zinc-700">
-                Open in new tab
-              </span>
-            </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    name="openInNewTab"
+                    type="checkbox"
+                  />
+                  New tab
+                </label>
+              </div>
 
-            <button
-              type="submit"
-              className="mt-5 w-full rounded-xl bg-zinc-950 px-4 py-3 text-sm font-semibold text-white"
-            >
-              Add item
-            </button>
-          </form>
+              <button
+                type="submit"
+                className="w-full rounded-lg bg-zinc-950 px-3 py-2 text-sm font-semibold text-white"
+              >
+                Add item
+              </button>
+            </form>
+          </details>
         </div>
 
-        <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-bold text-zinc-950">
-            Menu items
-          </h2>
+        <section className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-lg font-bold text-zinc-950">
+              Menu items
+            </h2>
+
+            <span className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-semibold text-zinc-500">
+              {menu.items.length}
+            </span>
+          </div>
 
           {menu.items.length ? (
-            <div className="mt-5 space-y-4">
+            <div className="mt-4 space-y-2">
               {menu.items.map((item) => (
-                <form
+                <details
                   key={item.id.toString()}
-                  action={updateMenuItemAction}
-                  className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4"
+                  className="rounded-xl border border-zinc-200 bg-zinc-50"
                 >
-                  <input
-                    type="hidden"
-                    name="id"
-                    value={item.id.toString()}
-                  />
-                  <input
-                    type="hidden"
-                    name="menuId"
-                    value={menu.id.toString()}
-                  />
+                  <summary className="flex cursor-pointer list-none items-center gap-3 px-3 py-3">
+                    <span className="text-zinc-400">☰</span>
 
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <label className="block">
-                      <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                        Label
-                      </span>
+                    <span className="min-w-0 flex-1 truncate text-sm font-semibold text-zinc-900">
+                      {item.label}
+                    </span>
+
+                    <span className="rounded-md bg-white px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-zinc-500">
+                      {item.type}
+                    </span>
+
+                    <span
+                      className={`h-2.5 w-2.5 rounded-full ${
+                        item.isEnabled
+                          ? "bg-emerald-500"
+                          : "bg-zinc-300"
+                      }`}
+                      title={item.isEnabled ? "Enabled" : "Disabled"}
+                    />
+                  </summary>
+
+                  <form
+                    action={updateMenuItemAction}
+                    className="border-t border-zinc-200 p-3"
+                  >
+                    <input
+                      type="hidden"
+                      name="id"
+                      value={item.id.toString()}
+                    />
+
+                    <input
+                      type="hidden"
+                      name="menuId"
+                      value={menu.id.toString()}
+                    />
+
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       <input
                         name="label"
                         required
                         defaultValue={item.label}
-                        className="mt-2 w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5"
+                        placeholder="Label"
+                        className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
                       />
-                    </label>
 
-                    <label className="block">
-                      <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                        Type
-                      </span>
                       <select
                         name="type"
                         defaultValue={item.type}
-                        className="mt-2 w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5"
+                        className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
                       >
                         <option value="PAGE">Page</option>
                         <option value="CATEGORY">Category</option>
                         <option value="CUSTOM_LINK">Custom link</option>
                       </select>
-                    </label>
 
-                    <label className="block">
-                      <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                        Page
-                      </span>
                       <select
                         name="pageId"
                         defaultValue={item.pageId?.toString() ?? ""}
-                        className="mt-2 w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5"
+                        className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
                       >
-                        <option value="">None</option>
+                        <option value="">No page</option>
                         {pages.map((page) => (
                           <option
                             key={page.id.toString()}
@@ -413,18 +386,13 @@ export default async function EditMenuPage({
                           </option>
                         ))}
                       </select>
-                    </label>
 
-                    <label className="block">
-                      <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                        Category
-                      </span>
                       <select
                         name="categoryId"
                         defaultValue={item.categoryId?.toString() ?? ""}
-                        className="mt-2 w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5"
+                        className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
                       >
-                        <option value="">None</option>
+                        <option value="">No category</option>
                         {categories.map((category) => (
                           <option
                             key={category.id.toString()}
@@ -434,27 +402,18 @@ export default async function EditMenuPage({
                           </option>
                         ))}
                       </select>
-                    </label>
 
-                    <label className="block">
-                      <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                        Custom URL
-                      </span>
                       <input
                         name="url"
                         defaultValue={item.url ?? ""}
-                        className="mt-2 w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5"
+                        placeholder="Custom URL"
+                        className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
                       />
-                    </label>
 
-                    <label className="block">
-                      <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                        Parent
-                      </span>
                       <select
                         name="parentId"
                         defaultValue={item.parentId?.toString() ?? ""}
-                        className="mt-2 w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5"
+                        className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
                       >
                         <option value="">No parent</option>
                         {menu.items
@@ -468,67 +427,58 @@ export default async function EditMenuPage({
                             </option>
                           ))}
                       </select>
-                    </label>
 
-                    <label className="block">
-                      <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                        Sort order
-                      </span>
                       <input
                         name="sortOrder"
                         type="number"
                         defaultValue={item.sortOrder}
-                        className="mt-2 w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5"
+                        className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
                       />
-                    </label>
 
-                    <div className="flex flex-wrap items-center gap-5 pt-6">
-                      <label className="flex items-center gap-2">
-                        <input
-                          name="isEnabled"
-                          type="checkbox"
-                          defaultChecked={item.isEnabled}
-                        />
-                        <span className="text-sm text-zinc-700">
+                      <div className="flex flex-wrap items-center gap-4 px-1 text-sm sm:col-span-2">
+                        <label className="flex items-center gap-2">
+                          <input
+                            name="isEnabled"
+                            type="checkbox"
+                            defaultChecked={item.isEnabled}
+                          />
                           Enabled
-                        </span>
-                      </label>
+                        </label>
 
-                      <label className="flex items-center gap-2">
-                        <input
-                          name="openInNewTab"
-                          type="checkbox"
-                          defaultChecked={item.openInNewTab}
-                        />
-                        <span className="text-sm text-zinc-700">
+                        <label className="flex items-center gap-2">
+                          <input
+                            name="openInNewTab"
+                            type="checkbox"
+                            defaultChecked={item.openInNewTab}
+                          />
                           New tab
-                        </span>
-                      </label>
+                        </label>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <button
-                      type="submit"
-                      className="rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-semibold text-white"
-                    >
-                      Save item
-                    </button>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        type="submit"
+                        className="rounded-lg bg-zinc-950 px-3 py-2 text-xs font-semibold text-white"
+                      >
+                        Save
+                      </button>
 
-                    <button
-                      type="submit"
-                      formAction={deleteMenuItemAction}
-                      className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700"
-                    >
-                      Delete item
-                    </button>
-                  </div>
-                </form>
+                      <button
+                        type="submit"
+                        formAction={deleteMenuItemAction}
+                        className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </form>
+                </details>
               ))}
             </div>
           ) : (
-            <div className="mt-5 rounded-xl bg-zinc-50 p-8 text-center text-sm text-zinc-500">
-              This menu does not contain items yet.
+            <div className="mt-4 rounded-xl bg-zinc-50 p-8 text-center text-sm text-zinc-500">
+              No menu items yet.
             </div>
           )}
         </section>
