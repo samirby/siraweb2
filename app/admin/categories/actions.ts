@@ -43,7 +43,7 @@ async function uniqueCategorySlug(base: string, currentId?: bigint) {
 }
 
 export async function createCategoryAction(formData: FormData) {
-  const user = await requirePermission("categories.manage");
+  const user = await requirePermission("posts.update");
 
   const name = text(formData, "name");
 
@@ -81,7 +81,7 @@ export async function createCategoryAction(formData: FormData) {
 }
 
 export async function updateCategoryAction(formData: FormData) {
-  const user = await requirePermission("categories.manage");
+  const user = await requirePermission("posts.update");
 
   const id = BigInt(text(formData, "id"));
   const name = text(formData, "name");
@@ -123,7 +123,7 @@ export async function updateCategoryAction(formData: FormData) {
 }
 
 export async function deleteCategoryAction(formData: FormData) {
-  const user = await requirePermission("categories.manage");
+  const user = await requirePermission("posts.update");
 
   const id = BigInt(text(formData, "id"));
 

@@ -18,7 +18,7 @@ type Props = {
 export default async function CategoriesPage({
   searchParams,
 }: Props) {
-  await requirePermission("categories.view");
+  await requirePermission("posts.view");
 
   const query = await searchParams;
 

@@ -17,7 +17,7 @@ type Props = {
 export default async function EditCategoryPage({
   params,
 }: Props) {
-  await requirePermission("categories.manage");
+  await requirePermission("posts.update");
 
   const { id: rawId } = await params;
 

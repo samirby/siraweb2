@@ -6,7 +6,7 @@ import { createCategoryAction } from "../actions";
 export const dynamic = "force-dynamic";
 
 export default async function NewCategoryPage() {
-  await requirePermission("categories.manage");
+  await requirePermission("posts.update");
 
   return (
     <main className="px-4 py-6 sm:px-6 lg:px-8">
