@@ -21,6 +21,10 @@ function safePage(value?: string) {
   return Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
 }
 
+function normalize(value: string | null | undefined) {
+  return (value ?? "").trim().toLocaleLowerCase();
+}
+
 export default async function PublicPostsPage({
   searchParams,
 }: Props) {
@@ -29,123 +33,29 @@ export default async function PublicPostsPage({
   const q = (query.q ?? "").trim();
   const category = (query.category ?? "").trim();
   const tag = (query.tag ?? "").trim();
-  const currentPage = safePage(query.page);
+  const requestedPage = safePage(query.page);
   const now = new Date();
 
   /*
-   * Resolve text search against categories and tags first.
-   * This avoids a fragile deeply nested OR filter and also means
-   * typing "Kosova" can find a post whose tag is "Kosova".
+   * IMPORTANT:
+   * Keep Prisma query intentionally simple and stable.
+   * Search/filtering is done in JavaScript after fetching published posts.
+   * This avoids nested MySQL/Prisma relation filters that were causing
+   * the production runtime error on Hostinger.
    */
-  const [matchingCategories, matchingTags] = q
-    ? await Promise.all([
-        prisma.category.findMany({
-          where: {
-            OR: [
-              { name: { contains: q } },
-              { slug: { contains: q } },
-            ],
-          },
-          select: {
-            id: true,
-          },
-          take: 50,
-        }),
-
-        prisma.tag.findMany({
-          where: {
-            OR: [
-              { name: { contains: q } },
-              { slug: { contains: q } },
-            ],
-          },
-          select: {
-            id: true,
-          },
-          take: 50,
-        }),
-      ])
-    : [[], []];
-
-  const matchingCategoryIds = matchingCategories.map((item) => item.id);
-  const matchingTagIds = matchingTags.map((item) => item.id);
-
-  const searchOr = q
-    ? [
-        { title: { contains: q } },
-        { excerpt: { contains: q } },
-        ...(matchingCategoryIds.length
-          ? [{ categoryId: { in: matchingCategoryIds } }]
-          : []),
-        ...(matchingTagIds.length
-          ? [
-              {
-                tags: {
-                  some: {
-                    tagId: {
-                      in: matchingTagIds,
-                    },
-                  },
-                },
-              },
-            ]
-          : []),
-      ]
-    : [];
-
-  const where = {
-    status: "PUBLISHED" as const,
-    AND: [
-      {
+  const [allPublishedPosts, categories, tags] = await Promise.all([
+    prisma.post.findMany({
+      where: {
+        status: "PUBLISHED",
         OR: [
           { publishedAt: null },
           { publishedAt: { lte: now } },
         ],
       },
-
-      ...(q
-        ? [
-            {
-              OR: searchOr,
-            },
-          ]
-        : []),
-
-      ...(category
-        ? [
-            {
-              category: {
-                slug: category,
-              },
-            },
-          ]
-        : []),
-
-      ...(tag
-        ? [
-            {
-              tags: {
-                some: {
-                  tag: {
-                    slug: tag,
-                  },
-                },
-              },
-            },
-          ]
-        : []),
-    ],
-  };
-
-  const [posts, total, categories, tags] = await Promise.all([
-    prisma.post.findMany({
-      where,
       orderBy: [
         { publishedAt: "desc" },
         { createdAt: "desc" },
       ],
-      skip: (currentPage - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
       include: {
         author: {
           select: {
@@ -160,10 +70,6 @@ export default async function PublicPostsPage({
           },
         },
       },
-    }),
-
-    prisma.post.count({
-      where,
     }),
 
     prisma.category.findMany({
@@ -187,7 +93,59 @@ export default async function PublicPostsPage({
     }),
   ]);
 
+  const normalizedQ = normalize(q);
+  const normalizedCategory = normalize(category);
+  const normalizedTag = normalize(tag);
+
+  const filteredPosts = allPublishedPosts.filter((post) => {
+    if (normalizedCategory) {
+      if (normalize(post.category?.slug) !== normalizedCategory) {
+        return false;
+      }
+    }
+
+    if (normalizedTag) {
+      const hasExactTag = post.tags.some(
+        (item) => normalize(item.tag.slug) === normalizedTag,
+      );
+
+      if (!hasExactTag) {
+        return false;
+      }
+    }
+
+    if (normalizedQ) {
+      const searchableValues = [
+        post.title,
+        post.excerpt,
+        post.category?.name,
+        post.category?.slug,
+        ...post.tags.flatMap((item) => [
+          item.tag.name,
+          item.tag.slug,
+        ]),
+      ]
+        .map(normalize)
+        .filter(Boolean);
+
+      const matchesSearch = searchableValues.some((value) =>
+        value.includes(normalizedQ),
+      );
+
+      if (!matchesSearch) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
+  const total = filteredPosts.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const currentPage = Math.min(requestedPage, totalPages);
+
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const posts = filteredPosts.slice(start, start + PAGE_SIZE);
 
   function buildHref(nextPage: number) {
     const params = new URLSearchParams();
@@ -219,7 +177,7 @@ export default async function PublicPostsPage({
             </h1>
 
             <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600">
-              Search articles by title, excerpt, category or tag.
+              Search articles by title, category or tag.
             </p>
           </header>
 
