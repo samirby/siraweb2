@@ -8,8 +8,8 @@ type Props = {
 
 export function AdminHeader({ name, email }: Props) {
   return (
-    <header className="sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur">
-      <div className="flex min-h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/95 backdrop-blur">
+      <div className="flex min-h-16 items-center justify-between gap-3 px-3 sm:px-5 lg:px-8">
         <div className="flex min-w-0 items-center gap-3">
           <AdminMobileNav />
 
@@ -28,10 +28,11 @@ export function AdminHeader({ name, email }: Props) {
             "use server";
             await signOut({ redirectTo: "/admin/login" });
           }}
+          className="shrink-0"
         >
           <button
             type="submit"
-            className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 sm:px-4"
+            className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm font-semibold text-zinc-700 shadow-sm transition hover:bg-zinc-50 sm:px-4"
           >
             Logout
           </button>

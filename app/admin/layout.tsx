@@ -14,7 +14,7 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-zinc-100 lg:flex">
+    <div className="min-h-screen overflow-x-hidden bg-zinc-100 lg:flex">
       <AdminSidebar />
 
       <div className="min-w-0 flex-1">
@@ -23,7 +23,7 @@ export default async function AdminLayout({
           email={session.user.email}
         />
 
-        <div className="min-w-0">
+        <div className="min-w-0 overflow-x-hidden">
           {children}
         </div>
       </div>
