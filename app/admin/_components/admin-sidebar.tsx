@@ -80,6 +80,7 @@ export function AdminSidebar() {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch
                 title={collapsed ? item.label : undefined}
                 className={`flex items-center rounded-xl text-sm font-medium transition ${
                   collapsed
