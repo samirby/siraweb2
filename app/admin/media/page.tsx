@@ -134,7 +134,7 @@ export default async function MediaAdminPage({
       : selectedLibrary;
 
   return (
-    <main className="px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
+    <main className="px-3 py-5 sm:px-5 sm:py-6 lg:px-7">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-sm font-medium text-zinc-500">
@@ -263,7 +263,7 @@ export default async function MediaAdminPage({
                 <h2 className="text-xl font-bold capitalize text-zinc-950">
                   {currentLibraryLabel}
                 </h2>
-                <p className="mt-1 text-xs text-zinc-500">
+                <p className="mt-1 text-[11px] text-zinc-500">
                   {currentCount} files
                 </p>
               </div>
@@ -362,7 +362,7 @@ export default async function MediaAdminPage({
             </div>
 
             {media.length ? (
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+              <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 {media.map((item) => {
                   const usageCount =
                     item._count.userAvatars +
@@ -381,14 +381,14 @@ export default async function MediaAdminPage({
                           src={item.url}
                           alt={item.altText || item.originalName}
                           loading="lazy"
-                          className="aspect-[4/3] w-full bg-zinc-100 object-cover"
+                          className="h-24 w-full bg-zinc-100 object-cover sm:h-28 xl:h-24 2xl:h-28"
                         />
 
-                        <div className="p-3">
-                          <p className="truncate text-sm font-semibold text-zinc-950">
+                        <div className="p-2.5">
+                          <p className="truncate text-xs font-semibold text-zinc-950">
                             {item.originalName}
                           </p>
-                          <p className="mt-1 text-xs text-zinc-500">
+                          <p className="mt-1 text-[11px] text-zinc-500">
                             {formatBytes(item.sizeBytes)} ·{" "}
                             {usageCount} uses
                           </p>
