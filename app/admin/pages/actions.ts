@@ -147,7 +147,7 @@ export async function createPageAction(formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/admin/pages");
-  redirect(`/admin/pages/${page.id.toString()}/edit`);
+  redirect("/admin/pages?created=1");
 }
 
 export async function updatePageAction(formData: FormData) {
@@ -209,7 +209,7 @@ export async function updatePageAction(formData: FormData) {
   revalidatePath("/admin");
   revalidatePath("/admin/pages");
   revalidatePath(`/admin/pages/${page.id.toString()}/edit`);
-  redirect(`/admin/pages/${page.id.toString()}/edit?saved=1`);
+  redirect("/admin/pages?saved=1");
 }
 
 export async function deletePageAction(formData: FormData) {
