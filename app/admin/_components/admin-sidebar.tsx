@@ -28,7 +28,7 @@ export function AdminSidebar() {
 
   return (
     <aside
-      className="sticky top-0 hidden h-dvh w-64 shrink-0 self-start flex-col overflow-y-auto overflow-x-hidden bg-zinc-950 text-white shadow-xl lg:flex"
+      className="sticky top-0 hidden h-dvh w-64 shrink-0 self-start flex-col overflow-y-auto overflow-x-hidden bg-zinc-950 text-white shadow-xl lg:flex relative z-10"
     >
       <div className="flex h-full flex-col">
         <div

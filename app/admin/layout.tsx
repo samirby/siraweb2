@@ -15,6 +15,10 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-zinc-100 lg:flex">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-y-0 left-0 z-0 hidden w-64 bg-zinc-950 lg:block"
+      />
       <AdminSidebar />
 
       <div className="min-w-0 flex-1">
