@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { prisma } from "@/lib/db/prisma";
+import { getSiteSettings } from "@/lib/settings/site-settings";
 import { PublicMobileNav } from "./public-mobile-nav";
 
 function itemHref(item: {
@@ -25,10 +26,8 @@ export async function PublicShell({
 }: {
   children: React.ReactNode;
 }) {
-  const [siteNameSetting, menus] = await Promise.all([
-    prisma.setting.findUnique({
-      where: { key: "site.name" },
-    }),
+  const [siteSettings, menus] = await Promise.all([
+    getSiteSettings(),
 
     prisma.menu.findMany({
       where: {
@@ -67,10 +66,7 @@ export async function PublicShell({
     }),
   ]);
 
-  const siteName =
-    typeof siteNameSetting?.value === "string"
-      ? siteNameSetting.value
-      : "SIRA Web";
+  const siteName = siteSettings.siteName;
 
   const topMenu = menus.find((menu) => menu.location === "TOP");
   const secondaryMenu = menus.find(
@@ -164,8 +160,48 @@ export async function PublicShell({
             </nav>
           ) : null}
 
-          <div className="text-sm">
-            © {new Date().getFullYear()} {siteName}. All rights reserved.
+          <div className="flex flex-col gap-4 border-t border-zinc-800 pt-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <div className="text-sm">
+                © {new Date().getFullYear()} {siteName}. {siteSettings.footerText}
+              </div>
+
+              {siteSettings.contactEmail || siteSettings.contactPhone ? (
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500">
+                  {siteSettings.contactEmail ? (
+                    <a href={`mailto:${siteSettings.contactEmail}`} className="hover:text-white">
+                      {siteSettings.contactEmail}
+                    </a>
+                  ) : null}
+                  {siteSettings.contactPhone ? (
+                    <a href={`tel:${siteSettings.contactPhone}`} className="hover:text-white">
+                      {siteSettings.contactPhone}
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+
+            <div className="flex flex-wrap gap-3 text-xs">
+              {[
+                ["Facebook", siteSettings.facebookUrl],
+                ["Instagram", siteSettings.instagramUrl],
+                ["LinkedIn", siteSettings.linkedinUrl],
+                ["X", siteSettings.xUrl],
+              ]
+                .filter(([, href]) => href)
+                .map(([label, href]) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white"
+                  >
+                    {label}
+                  </a>
+                ))}
+            </div>
           </div>
         </div>
       </footer>

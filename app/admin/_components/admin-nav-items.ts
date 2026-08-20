@@ -9,5 +9,5 @@ export const adminNavItems = [
   { href: "/admin/users", label: "Users", permission: "users.manage" },
   { href: "/admin/roles", label: "Roles", permission: "roles.manage" },
   { href: "/admin/messages", label: "Messages" },
-  { href: "/admin/settings", label: "Settings" },
+  { href: "/admin/settings", label: "Settings", permission: "roles.manage" },
 ] as const;
