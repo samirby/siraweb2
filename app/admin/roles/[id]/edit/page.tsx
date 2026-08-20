@@ -24,7 +24,7 @@ export default async function EditRolePage({
   params,
   searchParams,
 }: Props) {
-  await requirePermission("menus.manage");
+  await requirePermission("roles.manage");
 
   const { id: rawId } = await params;
   const query = await searchParams;

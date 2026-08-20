@@ -7,7 +7,7 @@ import { createUserAction } from "../actions";
 export const dynamic = "force-dynamic";
 
 export default async function NewUserPage() {
-  await requirePermission("menus.manage");
+  await requirePermission("users.manage");
 
   const roles = await prisma.role.findMany({
     orderBy: {

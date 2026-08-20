@@ -6,7 +6,7 @@ import { createRoleAction } from "../actions";
 export const dynamic = "force-dynamic";
 
 export default async function NewRolePage() {
-  await requirePermission("menus.manage");
+  await requirePermission("roles.manage");
 
   return (
     <main className="px-4 py-6 sm:px-6 lg:px-8">

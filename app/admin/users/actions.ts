@@ -60,7 +60,7 @@ async function ensureRole(roleId: bigint) {
 }
 
 export async function createUserAction(formData: FormData) {
-  const actor = await requirePermission("menus.manage");
+  const actor = await requirePermission("users.manage");
 
   const name = text(formData, "name");
   const email = normalizeEmail(text(formData, "email"));
@@ -114,7 +114,7 @@ export async function createUserAction(formData: FormData) {
 }
 
 export async function updateUserAction(formData: FormData) {
-  const actor = await requirePermission("menus.manage");
+  const actor = await requirePermission("users.manage");
 
   const id = BigInt(text(formData, "id"));
   const existing = await prisma.user.findUnique({
@@ -201,7 +201,7 @@ export async function updateUserAction(formData: FormData) {
 export async function toggleUserStatusAction(
   formData: FormData,
 ) {
-  const actor = await requirePermission("menus.manage");
+  const actor = await requirePermission("users.manage");
 
   const id = BigInt(text(formData, "id"));
 

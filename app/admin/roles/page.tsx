@@ -20,7 +20,7 @@ type Props = {
 export default async function RolesPage({
   searchParams,
 }: Props) {
-  const actor = await requirePermission("menus.manage");
+  const actor = await requirePermission("roles.manage");
   const query = await searchParams;
 
   const [roles, accessPermissions] = await Promise.all([

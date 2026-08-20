@@ -6,9 +6,19 @@ import { usePathname } from "next/navigation";
 import { adminNavItems } from "./admin-nav-items";
 import { AdminNavIcon } from "./admin-nav-icon";
 
-export function AdminSidebar() {
+export function AdminSidebar({
+  permissions,
+}: {
+  permissions: string[];
+}) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+
+  const visibleNavItems = adminNavItems.filter(
+    (item) =>
+      !("permission" in item) ||
+      permissions.includes(item.permission),
+  );
 
   useEffect(() => {
     const stored = window.localStorage.getItem("sira-admin-sidebar-collapsed");
@@ -85,7 +95,7 @@ export function AdminSidebar() {
         </div>
 
         <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto p-3">
-          {adminNavItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const active =
               item.href === "/admin"
                 ? pathname === "/admin"

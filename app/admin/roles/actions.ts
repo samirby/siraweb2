@@ -43,7 +43,7 @@ async function uniqueRoleSlug(base: string, currentId?: bigint) {
 }
 
 export async function createRoleAction(formData: FormData) {
-  const actor = await requirePermission("menus.manage");
+  const actor = await requirePermission("roles.manage");
 
   const name = text(formData, "name");
   const description = text(formData, "description");
@@ -80,7 +80,7 @@ export async function createRoleAction(formData: FormData) {
 }
 
 export async function updateRoleAction(formData: FormData) {
-  const actor = await requirePermission("menus.manage");
+  const actor = await requirePermission("roles.manage");
 
   const id = BigInt(text(formData, "id"));
   const name = text(formData, "name");
@@ -155,7 +155,7 @@ export async function updateRoleAction(formData: FormData) {
 }
 
 export async function deleteRoleAction(formData: FormData) {
-  const actor = await requirePermission("menus.manage");
+  const actor = await requirePermission("roles.manage");
 
   const id = BigInt(text(formData, "id"));
 
@@ -198,7 +198,7 @@ export async function deleteRoleAction(formData: FormData) {
 }
 
 export async function bootstrapAccessPermissionsAction() {
-  const actor = await requirePermission("menus.manage");
+  const actor = await requirePermission("roles.manage");
 
   const definitions = [
     {

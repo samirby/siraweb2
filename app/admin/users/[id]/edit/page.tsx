@@ -14,7 +14,7 @@ type Props = {
 export default async function EditUserPage({
   params,
 }: Props) {
-  const actor = await requirePermission("menus.manage");
+  const actor = await requirePermission("users.manage");
   const { id: rawId } = await params;
 
   let id: bigint;

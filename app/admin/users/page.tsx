@@ -18,7 +18,7 @@ type Props = {
 export default async function UsersAdminPage({
   searchParams,
 }: Props) {
-  const actor = await requirePermission("menus.manage");
+  const actor = await requirePermission("users.manage");
   const query = await searchParams;
 
   const users = await prisma.user.findMany({
