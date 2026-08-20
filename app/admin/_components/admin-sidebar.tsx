@@ -28,9 +28,7 @@ export function AdminSidebar() {
 
   return (
     <aside
-      className={`sticky top-0 hidden h-screen shrink-0 border-r border-zinc-800 bg-zinc-950 text-white transition-[width] duration-200 ease-out lg:block ${
-        collapsed ? "w-20" : "w-64"
-      }`}
+      className="sticky top-0 hidden h-dvh w-64 shrink-0 self-start flex-col overflow-y-auto overflow-x-hidden bg-zinc-950 text-white shadow-xl lg:flex"
     >
       <div className="flex h-full flex-col">
         <div
