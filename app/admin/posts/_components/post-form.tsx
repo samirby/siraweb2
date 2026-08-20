@@ -1,3 +1,4 @@
+import { RichTextEditor } from "./rich-text-editor";
 import { PostGalleryField } from "./post-gallery-field";
 import { PostMediaField } from "./post-media-field";
 
@@ -90,15 +91,21 @@ export function PostForm({
             />
           </label>
 
-          <label className="mt-5 block">
-            <span className="text-sm font-semibold text-zinc-800">Post content</span>
-            <textarea
+          <div className="mt-5">
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <span className="text-sm font-semibold text-zinc-800">
+                Post content
+              </span>
+              <span className="text-xs text-zinc-400">
+                Rich text
+              </span>
+            </div>
+
+            <RichTextEditor
               name="content"
-              rows={20}
-              defaultValue={value?.content ?? ""}
-              className="mt-2 w-full resize-y rounded-xl border border-zinc-300 px-4 py-3 font-mono text-sm leading-6 outline-none focus:border-zinc-950"
+              defaultValue={value?.content}
             />
-          </label>
+          </div>
         </section>
 
         <PostGalleryField

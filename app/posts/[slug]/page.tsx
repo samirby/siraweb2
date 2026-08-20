@@ -124,9 +124,12 @@ export default async function PublicPost({
 
           <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
             {post.content ? (
-              <div className="whitespace-pre-line text-base leading-8 text-zinc-700">
-                {post.content}
-              </div>
+              <div
+                className="rich-post-content text-base leading-8 text-zinc-700"
+                dangerouslySetInnerHTML={{
+                  __html: post.content,
+                }}
+              />
             ) : null}
 
             {post.secondaryMedia?.type === "IMAGE" ? (

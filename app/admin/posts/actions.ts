@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { requirePermission } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/db/prisma";
+import { sanitizeRichText } from "@/lib/content/sanitize-rich-text";
 
 const CONTENT_STATUSES = ["DRAFT", "PUBLISHED", "ARCHIVED"] as const;
 
@@ -75,7 +76,10 @@ function postDataFromForm(formData: FormData) {
     status: parseStatus(text(formData, "status")),
     categoryId: optionalBigInt(formData, "categoryId"),
     excerpt: optionalText(formData, "excerpt"),
-    content: optionalText(formData, "content"),
+    content: (() => {
+      const sanitized = sanitizeRichText(text(formData, "content"));
+      return sanitized || null;
+    })(),
     seoTitle: optionalText(formData, "seoTitle"),
     seoDescription: optionalText(formData, "seoDescription"),
     canonicalUrl: optionalText(formData, "canonicalUrl"),
