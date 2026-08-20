@@ -1,0 +1,166 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+
+import { PublicShell } from "@/app/_components/public-shell";
+import { prisma } from "@/lib/db/prisma";
+
+export const dynamic = "force-dynamic";
+
+type Props = {
+  params: Promise<{ slug: string }>;
+};
+
+async function getPublishedPost(slug: string) {
+  return prisma.post.findFirst({
+    where: {
+      slug,
+      status: "PUBLISHED",
+      OR: [
+        { publishedAt: null },
+        { publishedAt: { lte: new Date() } },
+      ],
+    },
+    include: {
+      author: {
+        select: {
+          name: true,
+        },
+      },
+      category: true,
+      featuredMedia: true,
+      secondaryMedia: true,
+      gallery: {
+        orderBy: {
+          sortOrder: "asc",
+        },
+        include: {
+          media: true,
+        },
+      },
+    },
+  });
+}
+
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPublishedPost(slug);
+
+  if (!post) return {};
+
+  return {
+    title: post.seoTitle || post.title,
+    description:
+      post.seoDescription ||
+      post.excerpt ||
+      undefined,
+    alternates: post.canonicalUrl
+      ? {
+          canonical: post.canonicalUrl,
+        }
+      : undefined,
+    robots: post.noIndex
+      ? {
+          index: false,
+          follow: true,
+        }
+      : undefined,
+  };
+}
+
+export default async function PublicPost({
+  params,
+}: Props) {
+  const { slug } = await params;
+  const post = await getPublishedPost(slug);
+
+  if (!post) {
+    notFound();
+  }
+
+  return (
+    <PublicShell>
+      <main className="min-h-[70vh] bg-white">
+        <article>
+          <header className="mx-auto max-w-4xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              {post.category?.name ?? "Article"}
+            </p>
+
+            <h1 className="mt-3 text-4xl font-bold tracking-tight text-zinc-950 sm:text-6xl">
+              {post.title}
+            </h1>
+
+            <div className="mt-5 flex flex-wrap gap-2 text-sm text-zinc-500">
+              <span>{post.author.name}</span>
+
+              {post.publishedAt ? (
+                <>
+                  <span>·</span>
+                  <span>
+                    {post.publishedAt.toLocaleDateString()}
+                  </span>
+                </>
+              ) : null}
+            </div>
+
+            {post.excerpt ? (
+              <p className="mt-6 text-lg leading-8 text-zinc-600">
+                {post.excerpt}
+              </p>
+            ) : null}
+          </header>
+
+          {post.featuredMedia?.type === "IMAGE" ? (
+            <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+              <img
+                src={post.featuredMedia.url}
+                alt={post.featuredMedia.altText || post.title}
+                className="aspect-[16/9] w-full rounded-3xl object-cover"
+              />
+            </div>
+          ) : null}
+
+          <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+            {post.content ? (
+              <div className="whitespace-pre-line text-base leading-8 text-zinc-700">
+                {post.content}
+              </div>
+            ) : null}
+
+            {post.secondaryMedia?.type === "IMAGE" ? (
+              <img
+                src={post.secondaryMedia.url}
+                alt={
+                  post.secondaryMedia.altText ||
+                  `${post.title} secondary image`
+                }
+                className="mt-10 w-full rounded-3xl object-cover"
+              />
+            ) : null}
+
+            {post.gallery.length ? (
+              <section className="mt-14 border-t border-zinc-200 pt-10">
+                <h2 className="text-2xl font-bold text-zinc-950">
+                  Gallery
+                </h2>
+
+                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {post.gallery.map((item) => (
+                    <img
+                      key={item.id.toString()}
+                      src={item.media.url}
+                      alt={item.media.altText || post.title}
+                      className="aspect-square w-full rounded-2xl object-cover"
+                    />
+                  ))}
+                </div>
+              </section>
+            ) : null}
+          </div>
+        </article>
+      </main>
+    </PublicShell>
+  );
+}
