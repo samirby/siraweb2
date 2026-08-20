@@ -59,15 +59,13 @@ export function MediaUploader() {
       action={upload}
       className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm"
     >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-zinc-950">
-            Upload media
-          </h2>
-          <p className="mt-1 text-sm text-zinc-500">
-            JPEG, PNG, WebP, GIF or AVIF · max 10 MB
-          </p>
-        </div>
+      <div>
+        <h2 className="text-lg font-bold text-zinc-950">
+          Upload media
+        </h2>
+        <p className="mt-1 text-sm text-zinc-500">
+          JPEG, PNG, WebP, GIF or AVIF · max 10 MB
+        </p>
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -102,9 +100,22 @@ export function MediaUploader() {
           <input
             name="folder"
             maxLength={255}
+            list="sira-media-folders"
+            defaultValue="misc"
             placeholder="pages, posts, gallery..."
             className="mt-2 w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-sm"
           />
+          <datalist id="sira-media-folders">
+            <option value="pages" />
+            <option value="posts" />
+            <option value="gallery" />
+            <option value="users" />
+            <option value="branding" />
+            <option value="misc" />
+          </datalist>
+          <span className="mt-1 block text-[11px] text-zinc-400">
+            Stored physically as folder / year / month / file.
+          </span>
         </label>
 
         <label className="md:col-span-2">

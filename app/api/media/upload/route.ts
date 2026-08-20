@@ -6,7 +6,11 @@ import { NextResponse } from "next/server";
 
 import { getApiUserWithPermission } from "@/lib/auth/api-user";
 import { prisma } from "@/lib/db/prisma";
-import { getMediaStorageRoot } from "@/lib/media/storage";
+import {
+  buildMediaRelativePath,
+  getMediaStorageRoot,
+  normalizeMediaFolder,
+} from "@/lib/media/storage";
 import {
   ALLOWED_MEDIA_MIME_TYPES,
   isAllowedMediaMimeType,
@@ -78,13 +82,23 @@ export async function POST(request: Request) {
 
   const extension = ALLOWED_MEDIA_MIME_TYPES.get(file.type)!;
   const now = new Date();
-  const year = String(now.getUTCFullYear());
-  const month = String(now.getUTCMonth() + 1).padStart(2, "0");
   const filename = `${crypto.randomUUID()}.${extension}`;
-  const relativePath = path.posix.join(year, month, filename);
+  const folder = normalizeMediaFolder(
+    cleanText(formData.get("folder"), 255),
+  );
+
+  const relativePath = buildMediaRelativePath({
+    folder,
+    filename,
+    date: now,
+  });
+
   const root = getMediaStorageRoot();
-  const targetDirectory = path.join(root, year, month);
-  const targetPath = path.join(targetDirectory, filename);
+  const targetPath = path.join(
+    root,
+    ...relativePath.split("/"),
+  );
+  const targetDirectory = path.dirname(targetPath);
 
   await mkdir(targetDirectory, { recursive: true });
 
@@ -94,7 +108,6 @@ export async function POST(request: Request) {
   const originalName = file.name.trim().slice(0, 255) || filename;
   const altText = cleanText(formData.get("altText"), 255) || null;
   const caption = cleanText(formData.get("caption"), 500) || null;
-  const folder = cleanText(formData.get("folder"), 255) || null;
   const checksum = crypto
     .createHash("sha256")
     .update(bytes)
@@ -136,6 +149,8 @@ export async function POST(request: Request) {
           originalName: updated.originalName,
           mimeType: updated.mimeType,
           sizeBytes: updated.sizeBytes.toString(),
+          folder: updated.folder,
+          path: updated.path,
         },
       },
     });
@@ -146,6 +161,7 @@ export async function POST(request: Request) {
         url: updated.url,
         originalName: updated.originalName,
         altText: updated.altText,
+        folder: updated.folder,
       },
     });
   } catch (error) {
