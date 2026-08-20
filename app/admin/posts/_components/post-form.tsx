@@ -1,3 +1,6 @@
+import { PostGalleryField } from "./post-gallery-field";
+import { PostMediaField } from "./post-media-field";
+
 type CategoryOption = {
   id: string;
   name: string;
@@ -36,28 +39,6 @@ type Props = {
   value?: PostValue;
 };
 
-function MediaPreview({
-  media,
-  id,
-}: {
-  media: MediaOption[];
-  id?: string | null;
-}) {
-  if (!id) return null;
-
-  const item = media.find((candidate) => candidate.id === id);
-
-  if (!item) return null;
-
-  return (
-    <img
-      src={item.url}
-      alt={item.altText || item.originalName}
-      className="mt-3 aspect-[16/9] w-full rounded-xl border border-zinc-200 object-cover"
-    />
-  );
-}
-
 export function PostForm({
   action,
   submitLabel,
@@ -70,16 +51,12 @@ export function PostForm({
       action={action}
       className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]"
     >
-      {value?.id ? (
-        <input type="hidden" name="id" value={value.id} />
-      ) : null}
+      {value?.id ? <input type="hidden" name="id" value={value.id} /> : null}
 
       <div className="space-y-6">
         <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
           <label className="block">
-            <span className="text-sm font-semibold text-zinc-800">
-              Title
-            </span>
+            <span className="text-sm font-semibold text-zinc-800">Title</span>
             <input
               name="title"
               required
@@ -90,9 +67,7 @@ export function PostForm({
           </label>
 
           <label className="mt-5 block">
-            <span className="text-sm font-semibold text-zinc-800">
-              Slug
-            </span>
+            <span className="text-sm font-semibold text-zinc-800">Slug</span>
             <input
               name="slug"
               defaultValue={value?.slug ?? ""}
@@ -103,14 +78,10 @@ export function PostForm({
         </section>
 
         <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
-          <h2 className="text-lg font-bold text-zinc-950">
-            Content
-          </h2>
+          <h2 className="text-lg font-bold text-zinc-950">Content</h2>
 
           <label className="mt-5 block">
-            <span className="text-sm font-semibold text-zinc-800">
-              Excerpt
-            </span>
+            <span className="text-sm font-semibold text-zinc-800">Excerpt</span>
             <textarea
               name="excerpt"
               rows={3}
@@ -120,9 +91,7 @@ export function PostForm({
           </label>
 
           <label className="mt-5 block">
-            <span className="text-sm font-semibold text-zinc-800">
-              Post content
-            </span>
+            <span className="text-sm font-semibold text-zinc-800">Post content</span>
             <textarea
               name="content"
               rows={20}
@@ -132,40 +101,13 @@ export function PostForm({
           </label>
         </section>
 
-        <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
-          <h2 className="text-lg font-bold text-zinc-950">
-            Gallery
-          </h2>
-          <p className="mt-1 text-sm text-zinc-500">
-            Select multiple images from Media Library.
-          </p>
-
-          <select
-            name="galleryMediaIds"
-            multiple
-            defaultValue={value?.galleryMediaIds ?? []}
-            className="mt-4 h-64 w-full rounded-xl border border-zinc-300 bg-white px-3 py-3 text-sm"
-          >
-            {media.map((item) => (
-              <option
-                key={item.id}
-                value={item.id}
-              >
-                {item.originalName}
-                {item.folder ? ` — ${item.folder}` : ""}
-              </option>
-            ))}
-          </select>
-
-          <p className="mt-2 text-xs text-zinc-400">
-            Hold Ctrl/Cmd to select multiple images.
-          </p>
-        </section>
+        <PostGalleryField
+          initialMedia={media}
+          defaultValues={value?.galleryMediaIds ?? []}
+        />
 
         <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
-          <h2 className="text-lg font-bold text-zinc-950">
-            SEO
-          </h2>
+          <h2 className="text-lg font-bold text-zinc-950">SEO</h2>
 
           <div className="mt-5 space-y-5">
             <input
@@ -209,9 +151,7 @@ export function PostForm({
 
       <aside className="space-y-6 xl:sticky xl:top-24 xl:self-start">
         <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-bold text-zinc-950">
-            Publish
-          </h2>
+          <h2 className="text-lg font-bold text-zinc-950">Publish</h2>
 
           <select
             name="status"
@@ -232,9 +172,7 @@ export function PostForm({
         </section>
 
         <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-bold text-zinc-950">
-            Category
-          </h2>
+          <h2 className="text-lg font-bold text-zinc-950">Category</h2>
 
           <select
             name="categoryId"
@@ -242,67 +180,29 @@ export function PostForm({
             className="mt-4 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3"
           >
             <option value="">Uncategorized</option>
-
             {categories.map((category) => (
-              <option
-                key={category.id}
-                value={category.id}
-              >
+              <option key={category.id} value={category.id}>
                 {category.name}
               </option>
             ))}
           </select>
         </section>
 
-        <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-bold text-zinc-950">
-            Featured image
-          </h2>
+        <PostMediaField
+          name="featuredMediaId"
+          label="Featured image"
+          initialMedia={media}
+          defaultValue={value?.featuredMediaId}
+          uploadFolder="posts"
+        />
 
-          <select
-            name="featuredMediaId"
-            defaultValue={value?.featuredMediaId ?? ""}
-            className="mt-4 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm"
-          >
-            <option value="">No featured image</option>
-
-            {media.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.originalName}
-              </option>
-            ))}
-          </select>
-
-          <MediaPreview
-            media={media}
-            id={value?.featuredMediaId}
-          />
-        </section>
-
-        <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-bold text-zinc-950">
-            Secondary image
-          </h2>
-
-          <select
-            name="secondaryMediaId"
-            defaultValue={value?.secondaryMediaId ?? ""}
-            className="mt-4 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm"
-          >
-            <option value="">No secondary image</option>
-
-            {media.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.originalName}
-              </option>
-            ))}
-          </select>
-
-          <MediaPreview
-            media={media}
-            id={value?.secondaryMediaId}
-          />
-        </section>
+        <PostMediaField
+          name="secondaryMediaId"
+          label="Secondary image"
+          initialMedia={media}
+          defaultValue={value?.secondaryMediaId}
+          uploadFolder="posts"
+        />
       </aside>
     </form>
   );
