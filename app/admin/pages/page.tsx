@@ -103,6 +103,16 @@ export default async function PagesAdminPage() {
 
                     <td className="px-5 py-4">
                       <div className="flex justify-end gap-2">
+                        {page.status === "PUBLISHED" ? (
+                          <Link
+                            href={`/${page.slug}`}
+                            target="_blank"
+                            className="rounded-lg border border-zinc-300 px-3 py-2 text-xs font-semibold text-zinc-700"
+                          >
+                            View
+                          </Link>
+                        ) : null}
+
                         <Link
                           href={`/admin/pages/${page.id.toString()}/edit`}
                           className="rounded-lg border border-zinc-300 px-3 py-2 text-xs font-semibold text-zinc-700"

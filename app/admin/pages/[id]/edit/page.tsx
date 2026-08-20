@@ -61,6 +61,16 @@ export default async function EditPagePage({
         </div>
 
         <div className="flex flex-wrap gap-2">
+          {page.status === "PUBLISHED" ? (
+            <Link
+              href={`/${page.slug}`}
+              target="_blank"
+              className="rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700"
+            >
+              View page
+            </Link>
+          ) : null}
+
           <form action={togglePagePublishAction}>
             <input type="hidden" name="id" value={page.id.toString()} />
             <button
