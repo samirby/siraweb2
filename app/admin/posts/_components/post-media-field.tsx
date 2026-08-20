@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 type MediaOption = {
   id: string;
@@ -25,6 +25,7 @@ export function PostMediaField({
   defaultValue,
   uploadFolder,
 }: Props) {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [media, setMedia] = useState(initialMedia);
   const [selectedId, setSelectedId] = useState(defaultValue ?? "");
   const [uploading, setUploading] = useState(false);
@@ -77,7 +78,7 @@ export function PostMediaField({
 
       setMedia((current) => [item, ...current]);
       setSelectedId(item.id);
-      setMessage("Uploaded and selected.");
+      setMessage("Uploaded");
     } catch {
       setMessage("Upload failed.");
     } finally {
@@ -86,59 +87,94 @@ export function PostMediaField({
   }
 
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-bold text-zinc-950">{label}</h2>
-
+    <section className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
       <input type="hidden" name={name} value={selectedId} />
 
-      <div className="mt-4 space-y-3">
-        <label className="block">
-          <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            Upload from computer
-          </span>
-
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
-            disabled={uploading}
-            onChange={(event) => {
-              const file = event.target.files?.[0] ?? null;
-              void uploadFile(file);
-              event.currentTarget.value = "";
-            }}
-            className="mt-2 block w-full rounded-xl border border-zinc-300 bg-white p-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-zinc-950 file:px-3 file:py-2 file:font-semibold file:text-white"
-          />
-        </label>
-
-        <div className="text-center text-xs font-semibold uppercase tracking-wide text-zinc-400">
-          or
-        </div>
-
-        <select
-          value={selectedId}
-          onChange={(event) => setSelectedId(event.target.value)}
-          className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm"
-        >
-          <option value="">No image</option>
-          {media.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.originalName}
-              {item.folder ? ` — ${item.folder}` : ""}
-            </option>
-          ))}
-        </select>
-
-        {uploading ? <p className="text-xs text-zinc-500">Uploading...</p> : null}
-        {message ? <p className="text-xs text-zinc-500">{message}</p> : null}
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-sm font-bold text-zinc-950">{label}</h2>
 
         {selected ? (
+          <button
+            type="button"
+            onClick={() => setSelectedId("")}
+            className="text-xs font-semibold text-zinc-400 hover:text-red-600"
+          >
+            Remove
+          </button>
+        ) : null}
+      </div>
+
+      {selected ? (
+        <div className="mt-3 flex items-center gap-3">
           <img
             src={selected.url}
             alt={selected.altText || selected.originalName}
-            className="aspect-[16/9] w-full rounded-xl border border-zinc-200 object-cover"
+            className="h-16 w-16 shrink-0 rounded-lg border border-zinc-200 object-cover"
           />
-        ) : null}
+
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-xs font-semibold text-zinc-800">
+              {selected.originalName}
+            </p>
+            <p className="mt-1 truncate text-[11px] text-zinc-400">
+              {selected.folder ?? uploadFolder}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-3 rounded-lg border border-dashed border-zinc-300 bg-zinc-50 px-3 py-4 text-center text-xs text-zinc-400">
+          No image selected
+        </div>
+      )}
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+        disabled={uploading}
+        className="hidden"
+        onChange={(event) => {
+          const file = event.target.files?.[0] ?? null;
+          void uploadFile(file);
+          event.currentTarget.value = "";
+        }}
+      />
+
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          disabled={uploading}
+          onClick={() => inputRef.current?.click()}
+          className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+        >
+          {uploading ? "Uploading..." : selected ? "Change" : "Upload"}
+        </button>
+
+        <details className="relative">
+          <summary className="cursor-pointer list-none rounded-lg border border-zinc-300 bg-white px-3 py-2 text-center text-xs font-semibold text-zinc-700 hover:bg-zinc-50">
+            Library
+          </summary>
+
+          <div className="absolute right-0 z-30 mt-2 w-72 rounded-xl border border-zinc-200 bg-white p-2 shadow-xl">
+            <select
+              value={selectedId}
+              onChange={(event) => setSelectedId(event.target.value)}
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-xs"
+            >
+              <option value="">No image</option>
+              {media.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.originalName}
+                </option>
+              ))}
+            </select>
+          </div>
+        </details>
       </div>
+
+      {message ? (
+        <p className="mt-2 text-[11px] text-zinc-400">{message}</p>
+      ) : null}
     </section>
   );
 }

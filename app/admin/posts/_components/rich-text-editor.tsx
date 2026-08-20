@@ -77,7 +77,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          "min-h-[420px] px-5 py-5 text-[16px] leading-7 text-zinc-800 outline-none focus:outline-none",
+          "min-h-[340px] px-4 py-4 text-[16px] leading-7 text-zinc-800 outline-none focus:outline-none",
       },
     },
     onUpdate({ editor }) {
