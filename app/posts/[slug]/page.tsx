@@ -224,14 +224,30 @@ export default async function PublicPost({
             ) : null}
 
             {post.secondaryMedia?.type === "IMAGE" ? (
-              <img
-                src={post.secondaryMedia.url}
-                alt={
-                  post.secondaryMedia.altText ||
-                  `${post.title} secondary image`
-                }
-                className="mt-10 w-full rounded-3xl object-cover"
-              />
+              post.secondaryMedia.width && post.secondaryMedia.height ? (
+                <Image
+                  src={post.secondaryMedia.url}
+                  alt={
+                    post.secondaryMedia.altText ||
+                    `${post.title} secondary image`
+                  }
+                  width={post.secondaryMedia.width}
+                  height={post.secondaryMedia.height}
+                  sizes="(max-width: 768px) 100vw, 768px"
+                  className="mt-10 h-auto w-full rounded-3xl object-cover"
+                />
+              ) : (
+                <img
+                  src={post.secondaryMedia.url}
+                  alt={
+                    post.secondaryMedia.altText ||
+                    `${post.title} secondary image`
+                  }
+                  loading="lazy"
+                  decoding="async"
+                  className="mt-10 w-full rounded-3xl object-cover"
+                />
+              )
             ) : null}
 
             {post.gallery.length ? (
