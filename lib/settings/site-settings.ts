@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db/prisma";
 
 export type SiteSettings = {
@@ -51,7 +52,7 @@ const settingMap = {
   "branding.faviconMediaId": "faviconMediaId",
 } as const;
 
-export async function getSiteSettings(): Promise<SiteSettings> {
+async function loadSiteSettings(): Promise<SiteSettings> {
   try {
     const settings = await prisma.setting.findMany({
       where: {
@@ -92,3 +93,13 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     return { ...defaults };
   }
 }
+
+
+export const getSiteSettings = unstable_cache(
+  loadSiteSettings,
+  ["sira-site-settings"],
+  {
+    revalidate: 60,
+    tags: ["site-settings"],
+  },
+);

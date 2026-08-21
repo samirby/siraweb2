@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 
 import { PublicShell } from "@/app/_components/public-shell";
 import { prisma } from "@/lib/db/prisma";
@@ -12,7 +13,7 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-async function getCategory(slug: string) {
+const getCategory = cache(async (slug: string) => {
   return prisma.category.findUnique({
     where: { slug },
     include: {
@@ -38,7 +39,7 @@ async function getCategory(slug: string) {
       },
     },
   });
-}
+});
 
 export async function generateMetadata({
   params,

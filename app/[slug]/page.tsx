@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 
 import { PublicShell } from "@/app/_components/public-shell";
 import { prisma } from "@/lib/db/prisma";
@@ -11,7 +12,7 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-async function getPublishedPage(slug: string) {
+const getPublishedPage = cache(async (slug: string) => {
   return prisma.page.findFirst({
     where: {
       slug,
@@ -25,7 +26,7 @@ async function getPublishedPage(slug: string) {
       featuredMedia: true,
     },
   });
-}
+});
 
 export async function generateMetadata({
   params,

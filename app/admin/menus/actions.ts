@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requirePermission } from "@/lib/auth/permissions";
@@ -140,6 +140,7 @@ export async function updateMenuAction(formData: FormData) {
 
   revalidatePath("/admin/menus");
   revalidatePath(`/admin/menus/${id.toString()}/edit`);
+  revalidateTag("public-menus", "max");
   revalidatePath("/");
   redirect(`/admin/menus/${id.toString()}/edit?saved=1`);
 }
@@ -177,6 +178,7 @@ export async function deleteMenuAction(formData: FormData) {
   });
 
   revalidatePath("/admin/menus");
+  revalidateTag("public-menus", "max");
   revalidatePath("/");
   redirect("/admin/menus");
 }
@@ -247,6 +249,7 @@ export async function addMenuItemAction(formData: FormData) {
 
   revalidatePath("/admin/menus");
   revalidatePath(`/admin/menus/${menuId.toString()}/edit`);
+  revalidateTag("public-menus", "max");
   revalidatePath("/");
   redirect(`/admin/menus/${menuId.toString()}/edit?itemAdded=1`);
 }
@@ -283,6 +286,7 @@ export async function updateMenuItemAction(formData: FormData) {
 
   revalidatePath("/admin/menus");
   revalidatePath(`/admin/menus/${menuId.toString()}/edit`);
+  revalidateTag("public-menus", "max");
   revalidatePath("/");
   redirect(`/admin/menus/${menuId.toString()}/edit?itemSaved=1`);
 }
@@ -322,6 +326,7 @@ export async function deleteMenuItemAction(formData: FormData) {
 
   revalidatePath("/admin/menus");
   revalidatePath(`/admin/menus/${menuId.toString()}/edit`);
+  revalidateTag("public-menus", "max");
   revalidatePath("/");
   redirect(`/admin/menus/${menuId.toString()}/edit`);
 }

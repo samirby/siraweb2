@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 
 import { PublicShell } from "@/app/_components/public-shell";
 import { JsonLd } from "@/app/_components/seo/json-ld";
@@ -14,7 +15,7 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-async function getPublishedPost(slug: string) {
+const getPublishedPost = cache(async (slug: string) => {
   return prisma.post.findFirst({
     where: {
       slug,
@@ -43,7 +44,7 @@ async function getPublishedPost(slug: string) {
       },
     },
   });
-}
+});
 
 export async function generateMetadata({
   params,

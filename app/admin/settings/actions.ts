@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requirePermission } from "@/lib/auth/permissions";
@@ -154,6 +154,7 @@ export async function saveSettingsAction(
     },
   });
 
+  revalidateTag("site-settings", "max");
   revalidatePath("/admin/settings");
   revalidatePath("/");
   revalidatePath("/posts");

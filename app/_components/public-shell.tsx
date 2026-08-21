@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/db/prisma";
 import { getSiteSettings } from "@/lib/settings/site-settings";
@@ -21,32 +22,24 @@ function itemHref(item: {
   return item.url || "#";
 }
 
-export async function PublicShell({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [siteSettings, menus] = await Promise.all([
-    getSiteSettings(),
 
-    prisma.menu.findMany({
+const getPublicMenus = unstable_cache(
+  async () => {
+    const menus = await prisma.menu.findMany({
       where: {
         location: {
           in: ["TOP", "FOOTER", "SECONDARY"],
         },
       },
-
       include: {
         items: {
           where: {
             isEnabled: true,
           },
-
           orderBy: [
             { sortOrder: "asc" },
             { id: "asc" },
           ],
-
           include: {
             page: {
               select: {
@@ -54,7 +47,6 @@ export async function PublicShell({
                 status: true,
               },
             },
-
             category: {
               select: {
                 slug: true,
@@ -63,7 +55,37 @@ export async function PublicShell({
           },
         },
       },
-    }),
+    });
+
+    return menus.map((menu) => ({
+      ...menu,
+      id: menu.id.toString(),
+      items: menu.items.map((item) => ({
+        ...item,
+        id: item.id,
+        menuId: item.menuId.toString(),
+        parentId: item.parentId?.toString() ?? null,
+        pageId: item.pageId?.toString() ?? null,
+        categoryId: item.categoryId?.toString() ?? null,
+      })),
+    }));
+  },
+  ["sira-public-menus"],
+  {
+    revalidate: 60,
+    tags: ["public-menus"],
+  },
+);
+
+export async function PublicShell({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [siteSettings, menus] = await Promise.all([
+    getSiteSettings(),
+
+    getPublicMenus(),
   ]);
 
   const siteName = siteSettings.siteName;
@@ -78,7 +100,7 @@ export async function PublicShell({
 
   const topItems =
     topMenu?.items.map((item) => ({
-      id: item.id.toString(),
+      id: String(item.id),
       label: item.label,
       href: itemHref(item),
       openInNewTab: item.openInNewTab,
@@ -86,7 +108,7 @@ export async function PublicShell({
 
   const secondaryItems =
     secondaryMenu?.items.map((item) => ({
-      id: item.id.toString(),
+      id: String(item.id),
       label: item.label,
       href: itemHref(item),
       openInNewTab: item.openInNewTab,
@@ -99,7 +121,7 @@ export async function PublicShell({
           <div className="mx-auto flex min-h-9 max-w-7xl items-center justify-end gap-4 px-4 text-xs sm:px-6 lg:px-8">
             {secondaryMenu.items.map((item) => (
               <Link
-                key={item.id.toString()}
+                key={String(item.id)}
                 href={itemHref(item)}
                 target={item.openInNewTab ? "_blank" : undefined}
                 className="transition hover:text-white"
@@ -134,7 +156,7 @@ export async function PublicShell({
           <nav className="hidden items-center gap-5 md:flex">
             {topMenu?.items.map((item) => (
               <Link
-                key={item.id.toString()}
+                key={String(item.id)}
                 href={itemHref(item)}
                 target={item.openInNewTab ? "_blank" : undefined}
                 className="text-sm font-medium text-zinc-600 transition hover:text-zinc-950"
@@ -160,7 +182,7 @@ export async function PublicShell({
             <nav className="mb-6 flex flex-wrap gap-x-5 gap-y-2">
               {footerMenu.items.map((item) => (
                 <Link
-                  key={item.id.toString()}
+                  key={String(item.id)}
                   href={itemHref(item)}
                   target={item.openInNewTab ? "_blank" : undefined}
                   className="text-sm transition hover:text-white"
