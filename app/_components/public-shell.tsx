@@ -130,6 +130,7 @@ export async function PublicShell({
   return (
     <div
       style={themeStyle}
+      data-card-style={siteSettings.layoutCardStyle}
       className="sira-public min-h-screen selection:bg-zinc-950 selection:text-white"
     >
       {secondaryMenu?.items.length ? (

@@ -339,3 +339,6 @@ textarea {
     line-height: 1.8;
   }
 }
+
+.sira-public[data-card-style="flat"] .sira-card { box-shadow: none; }
+.sira-public[data-card-style="bordered"] .sira-card { box-shadow: none; border-width: 2px; }

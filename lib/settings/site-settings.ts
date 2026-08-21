@@ -24,6 +24,13 @@ export type SiteSettings = {
   designBodyFont: string;
   designBorderRadius: string;
   designContainerWidth: string;
+  layoutShowTrustStrip: string;
+  layoutShowServices: string;
+  layoutShowCategories: string;
+  layoutShowLatestPosts: string;
+  layoutShowBottomCta: string;
+  layoutHeroStyle: string;
+  layoutCardStyle: string;
 };
 
 const defaults: SiteSettings = {
@@ -49,6 +56,13 @@ const defaults: SiteSettings = {
   designBodyFont: "Arial",
   designBorderRadius: "16px",
   designContainerWidth: "1280px",
+  layoutShowTrustStrip: "true",
+  layoutShowServices: "true",
+  layoutShowCategories: "true",
+  layoutShowLatestPosts: "true",
+  layoutShowBottomCta: "true",
+  layoutHeroStyle: "brand",
+  layoutCardStyle: "elevated",
 };
 
 const settingMap = {
@@ -74,6 +88,13 @@ const settingMap = {
   "design.bodyFont": "designBodyFont",
   "design.borderRadius": "designBorderRadius",
   "design.containerWidth": "designContainerWidth",
+  "layout.showTrustStrip": "layoutShowTrustStrip",
+  "layout.showServices": "layoutShowServices",
+  "layout.showCategories": "layoutShowCategories",
+  "layout.showLatestPosts": "layoutShowLatestPosts",
+  "layout.showBottomCta": "layoutShowBottomCta",
+  "layout.heroStyle": "layoutHeroStyle",
+  "layout.cardStyle": "layoutCardStyle",
 } as const;
 
 async function loadSiteSettings(): Promise<SiteSettings> {

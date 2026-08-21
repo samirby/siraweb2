@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requirePermission } from "@/lib/auth/permissions";
 import { getSiteSettings } from "@/lib/settings/site-settings";
 import { resetDesignSettings, saveDesignSettings } from "./actions";
@@ -35,6 +36,18 @@ export default async function AdminDesignPage({ searchParams }: Props) {
             Manage the visual theme of the public website without editing code.
           </p>
         </header>
+
+        <Link
+          href="/admin/design/layout"
+          className="mb-6 flex items-center justify-between rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:shadow-md"
+        >
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">Module 2</p>
+            <h2 className="mt-1 text-lg font-bold text-zinc-950">Homepage Layout</h2>
+            <p className="mt-1 text-sm text-zinc-600">Section visibility and layout variants.</p>
+          </div>
+          <span className="text-xl text-zinc-400">→</span>
+        </Link>
 
         {query.saved === "1" ? (
           <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
