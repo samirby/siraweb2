@@ -479,8 +479,7 @@ export default async function MediaAdminPage({
                             />
                             <button
                               type="submit"
-                              disabled={usageCount > 0}
-                              className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 disabled:opacity-40"
+                              className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100"
                             >
                               Delete
                             </button>
