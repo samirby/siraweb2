@@ -150,7 +150,7 @@ export function PublicMobileNav({
         aria-label={open ? "Close menu" : "Open menu"}
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-300 bg-white text-zinc-950 shadow-sm md:hidden"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-300 bg-white text-zinc-950 shadow-sm transition hover:border-zinc-400 md:hidden"
       >
         <span className="relative block h-5 w-5">
           <span

@@ -249,3 +249,93 @@ textarea {
 .sira-public .public-section-title {
   color: var(--sira-text, #09090b);
 }
+
+/* === SIRA Frontend Design Phase A === */
+
+.sira-public {
+  --sira-shadow-sm: 0 10px 30px rgba(0, 0, 0, 0.05);
+  --sira-shadow-md: 0 20px 55px rgba(0, 0, 0, 0.09);
+  --sira-border: color-mix(in srgb, var(--sira-text, #18181b) 12%, transparent);
+  --sira-muted: color-mix(in srgb, var(--sira-text, #18181b) 64%, transparent);
+  --sira-soft: color-mix(in srgb, var(--sira-primary, #09090b) 6%, var(--sira-background, #ffffff));
+}
+
+.sira-hero {
+  background:
+    radial-gradient(circle at 85% 15%, color-mix(in srgb, var(--sira-primary) 72%, white) 0%, transparent 28%),
+    linear-gradient(135deg, var(--sira-primary, #09090b) 0%, #18181b 52%, #09090b 100%);
+}
+
+.sira-card {
+  border: 1px solid var(--sira-border);
+  border-radius: calc(var(--sira-radius, 16px) + 4px);
+  background: var(--sira-background, #ffffff);
+  box-shadow: var(--sira-shadow-sm);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.sira-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--sira-shadow-md);
+  border-color: color-mix(in srgb, var(--sira-primary, #09090b) 24%, transparent);
+}
+
+.sira-soft-section {
+  background: var(--sira-soft);
+}
+
+.sira-primary-chip {
+  background: color-mix(in srgb, var(--sira-primary, #09090b) 8%, transparent);
+  color: var(--sira-primary, #09090b);
+}
+
+.sira-public .public-eyebrow {
+  color: var(--sira-secondary, #52525b);
+}
+
+.sira-public .public-button-primary {
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--sira-primary, #09090b) 22%, transparent);
+}
+
+.sira-public .public-button-primary:focus-visible,
+.sira-public .public-button-secondary:focus-visible,
+.sira-public a:focus-visible,
+.sira-public button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--sira-primary, #09090b) 35%, white);
+  outline-offset: 3px;
+}
+
+.sira-public .public-prose {
+  font-size: 1.04rem;
+  line-height: 1.9;
+}
+
+.sira-public .public-prose h2 {
+  margin-top: 2.4rem;
+  font-size: clamp(1.6rem, 3vw, 2rem);
+}
+
+.sira-public .public-prose h3 {
+  margin-top: 2rem;
+}
+
+.sira-public .public-prose blockquote {
+  border-left-color: var(--sira-primary, #09090b);
+  background: var(--sira-soft);
+  border-radius: 0 var(--sira-radius, 16px) var(--sira-radius, 16px) 0;
+  padding: 1rem 1.25rem;
+}
+
+@media (max-width: 639px) {
+  .sira-public .public-section-title {
+    font-size: 1.85rem;
+  }
+
+  .sira-public .public-prose {
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+}

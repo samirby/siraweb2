@@ -149,7 +149,7 @@ export async function PublicShell({
         </div>
       ) : null}
 
-      <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-white/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 border-b border-zinc-200/70 bg-white/88 shadow-[0_8px_30px_rgba(0,0,0,0.035)] backdrop-blur-xl">
         <div className="mx-auto flex min-h-[4.5rem] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <Link
             href="/"
@@ -188,7 +188,7 @@ export async function PublicShell({
 
             <Link
               href="/contact"
-              className="rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-800"
+              className="public-button-primary px-4 py-2.5"
             >
               Contact
             </Link>
@@ -204,7 +204,7 @@ export async function PublicShell({
 
       {children}
 
-      <footer className="border-t border-zinc-800 bg-zinc-950 text-zinc-400">
+      <footer className="sira-hero border-t border-white/10 text-zinc-300">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           {footerMenu?.items.length ? (
             <nav className="mb-6 flex flex-wrap gap-x-5 gap-y-2">

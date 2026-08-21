@@ -213,7 +213,7 @@ export default async function PublicPost({
       <JsonLd data={articleSchema} />
       <main className="min-h-[70vh] bg-white">
         <article>
-          <header className="mx-auto max-w-4xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+          <header className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
             {post.category ? (
               <Link
                 href={`/category/${post.category.slug}`}
@@ -227,7 +227,7 @@ export default async function PublicPost({
               </p>
             )}
 
-            <h1 className="mt-3 text-4xl font-bold tracking-tight text-zinc-950 sm:text-6xl">
+            <h1 className="mt-3 text-4xl font-bold leading-[1.08] tracking-[-0.04em] text-zinc-950 sm:text-6xl">
               {post.title}
             </h1>
 
@@ -253,7 +253,7 @@ export default async function PublicPost({
 
           {post.featuredMedia?.type === "IMAGE" ? (
             <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-              <div className="relative aspect-[16/9] overflow-hidden rounded-3xl">
+              <div className="relative aspect-[16/9] overflow-hidden rounded-[1.75rem] shadow-xl">
                 <Image
                   src={post.featuredMedia.url}
                   alt={post.featuredMedia.altText || post.title}

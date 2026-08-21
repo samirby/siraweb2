@@ -38,7 +38,7 @@ export default async function ContactPage({ searchParams }: Props) {
         </section>
 
         <section className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-8 lg:py-16">
-          <div className="rounded-[1.75rem] border border-zinc-200 bg-white p-6 shadow-sm sm:p-8">
+          <div className="sira-card p-6 sm:p-8">
             {query.sent === "1" ? (
               <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
                 Thank you. Your message has been sent successfully.
@@ -101,7 +101,7 @@ export default async function ContactPage({ searchParams }: Props) {
             </form>
           </div>
 
-          <aside className="rounded-[1.75rem] bg-zinc-950 p-7 text-white shadow-xl">
+          <aside className="sira-hero rounded-[1.75rem] p-7 text-white shadow-xl">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
               Contact details
             </p>

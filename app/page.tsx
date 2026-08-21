@@ -64,7 +64,7 @@ export default async function Home() {
   return (
     <PublicShell>
       <main>
-        <section className="relative overflow-hidden bg-zinc-950 text-white">
+        <section className="sira-hero relative overflow-hidden text-white">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_34%)]" />
           <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:px-8 lg:py-28">
             <div>
@@ -151,7 +151,7 @@ export default async function Home() {
         </section>
 
         {services.length ? (
-          <section className="bg-zinc-50">
+          <section className="sira-soft-section">
             <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
               <div className="public-section-heading">
                 <div>
@@ -165,7 +165,7 @@ export default async function Home() {
                   <Link
                     key={service.id.toString()}
                     href={`/${service.slug}`}
-                    className="group overflow-hidden rounded-[1.5rem] border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+                    className="sira-card group overflow-hidden"
                   >
                     {service.featuredMedia?.type === "IMAGE" ? (
                       <div className="relative aspect-[16/9] overflow-hidden">
@@ -245,7 +245,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="bg-zinc-950 text-white">
+        <section className="sira-hero text-white">
           <div className="mx-auto flex max-w-7xl flex-col gap-7 px-4 py-14 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">

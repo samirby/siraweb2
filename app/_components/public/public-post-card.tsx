@@ -23,7 +23,7 @@ export function PublicPostCard({ post, compact = false }: PostCardProps) {
   const date = post.publishedAt ?? post.createdAt;
 
   return (
-    <article className="group overflow-hidden rounded-[1.5rem] border border-zinc-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+    <article className="sira-card group overflow-hidden">
       {post.featuredMedia?.type === "IMAGE" ? (
         <Link
           href={`/posts/${post.slug}`}
@@ -52,7 +52,7 @@ export function PublicPostCard({ post, compact = false }: PostCardProps) {
           {post.category ? (
             <Link
               href={`/category/${post.category.slug}`}
-              className="rounded-full bg-zinc-100 px-2.5 py-1 font-semibold text-zinc-700 transition hover:bg-zinc-200"
+              className="sira-primary-chip rounded-full px-2.5 py-1 font-semibold transition hover:opacity-80"
             >
               {post.category.name}
             </Link>
