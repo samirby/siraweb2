@@ -205,67 +205,181 @@ export async function PublicShell({
 
       {children}
 
-      <footer className="sira-hero border-t border-white/10 text-zinc-300">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          {footerMenu?.items.length ? (
-            <nav className="mb-6 flex flex-wrap gap-x-5 gap-y-2">
-              {footerMenu.items.map((item) => (
+      <footer
+        data-footer-style={siteSettings.footerStyle}
+        className="sira-footer text-white"
+      >
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+          <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-4 xl:gap-12">
+            {siteSettings.footerShowBrand !== "false" ? (
+              <section>
                 <Link
-                  key={String(item.id)}
-                  href={itemHref(item)}
-                  target={item.openInNewTab ? "_blank" : undefined}
-                  className="text-sm transition hover:text-white"
+                  href="/"
+                  className="inline-flex items-center text-2xl font-black tracking-[0.28em] text-white"
                 >
-                  {item.label}
+                  {siteName}
                 </Link>
-              ))}
-            </nav>
-          ) : null}
 
-          <div className="flex flex-col gap-4 border-t border-zinc-800 pt-5 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <div className="text-sm">
-                © {new Date().getFullYear()} {siteName}. {siteSettings.footerText}
-              </div>
+                <p className="mt-5 max-w-sm text-sm leading-7 text-white/70">
+                  {siteSettings.footerBrandText ||
+                    siteSettings.siteDescription ||
+                    "Modern digital experiences, useful content and reliable services."}
+                </p>
 
-              {siteSettings.contactEmail || siteSettings.contactPhone ? (
-                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500">
-                  {siteSettings.contactEmail ? (
-                    <a href={`mailto:${siteSettings.contactEmail}`} className="hover:text-white">
-                      {siteSettings.contactEmail}
-                    </a>
-                  ) : null}
-                  {siteSettings.contactPhone ? (
-                    <a href={`tel:${siteSettings.contactPhone}`} className="hover:text-white">
-                      {siteSettings.contactPhone}
-                    </a>
-                  ) : null}
+                {siteSettings.footerShowSocials !== "false" ? (
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    {[
+                      ["Instagram", siteSettings.instagramUrl],
+                      ["X", siteSettings.xUrl],
+                      ["Facebook", siteSettings.facebookUrl],
+                      ["LinkedIn", siteSettings.linkedinUrl],
+                    ]
+                      .filter(([, href]) => href)
+                      .map(([label, href]) => (
+                        <a
+                          key={label}
+                          href={href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="grid h-10 min-w-10 place-items-center rounded-full border border-white/15 bg-white/5 px-3 text-xs font-semibold text-white/85 transition hover:bg-white hover:text-zinc-950"
+                        >
+                          {label}
+                        </a>
+                      ))}
+                  </div>
+                ) : null}
+              </section>
+            ) : null}
+
+            {siteSettings.footerShowQuickLinks !== "false" ? (
+              <section>
+                <h2 className="text-lg font-bold text-white">Quick Links</h2>
+                <nav className="mt-5 grid gap-3">
+                  {(footerMenu?.items.length
+                    ? footerMenu.items
+                    : topMenu?.items ?? []
+                  ).map((item) => (
+                    <Link
+                      key={String(item.id)}
+                      href={itemHref(item)}
+                      target={item.openInNewTab ? "_blank" : undefined}
+                      className="group flex items-center justify-between gap-3 text-sm text-white/75 transition hover:text-white"
+                    >
+                      <span>{item.label}</span>
+                      <span className="text-white/35 transition group-hover:translate-x-1 group-hover:text-white">
+                        →
+                      </span>
+                    </Link>
+                  ))}
+                </nav>
+              </section>
+            ) : null}
+
+            <section className="space-y-8">
+              {siteSettings.footerShowSocials !== "false" ? (
+                <div>
+                  <h2 className="text-lg font-bold text-white">Follow Us</h2>
+                  <div className="mt-4 flex flex-wrap gap-x-2 gap-y-2 text-sm text-white/70">
+                    {[
+                      ["Instagram", siteSettings.instagramUrl],
+                      ["X", siteSettings.xUrl],
+                      ["Facebook", siteSettings.facebookUrl],
+                      ["LinkedIn", siteSettings.linkedinUrl],
+                    ]
+                      .filter(([, href]) => href)
+                      .map(([label, href], index, items) => (
+                        <span key={label} className="inline-flex items-center gap-2">
+                          <a
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="transition hover:text-white"
+                          >
+                            {label}
+                          </a>
+                          {index < items.length - 1 ? (
+                            <span className="text-white/30">•</span>
+                          ) : null}
+                        </span>
+                      ))}
+                  </div>
                 </div>
               ) : null}
-            </div>
 
-            <div className="flex flex-wrap gap-3 text-xs">
-              {[
-                ["Facebook", siteSettings.facebookUrl],
-                ["Instagram", siteSettings.instagramUrl],
-                ["LinkedIn", siteSettings.linkedinUrl],
-                ["X", siteSettings.xUrl],
-              ]
-                .filter(([, href]) => href)
-                .map(([label, href]) => (
+              {siteSettings.footerShowOffice !== "false" ? (
+                <div>
+                  <h2 className="text-lg font-bold text-white">
+                    {siteSettings.footerOfficeTitle || "Office"}
+                  </h2>
+                  <p className="mt-3 whitespace-pre-line text-sm leading-6 text-white/70">
+                    {siteSettings.footerOfficeAddress ||
+                      "Add office details from Admin → Design → Footer."}
+                  </p>
+                </div>
+              ) : null}
+            </section>
+
+            <section className="flex flex-col justify-between gap-8">
+              {siteSettings.footerShowEmail !== "false" ? (
+                <div>
+                  <h2 className="text-lg font-bold text-white">Email</h2>
+                  {siteSettings.contactEmail ? (
+                    <a
+                      href={`mailto:${siteSettings.contactEmail}`}
+                      className="mt-3 block break-all text-sm text-white/75 transition hover:text-white"
+                    >
+                      {siteSettings.contactEmail}
+                    </a>
+                  ) : (
+                    <p className="mt-3 text-sm text-white/55">
+                      Add contact email in Settings.
+                    </p>
+                  )}
+                </div>
+              ) : null}
+
+              {siteSettings.contactPhone ? (
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/40">
+                    Phone
+                  </p>
                   <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-white"
+                    href={`tel:${siteSettings.contactPhone}`}
+                    className="mt-2 block text-sm text-white/75 transition hover:text-white"
                   >
-                    {label}
+                    {siteSettings.contactPhone}
                   </a>
-                ))}
-            </div>
+                </div>
+              ) : null}
+            </section>
           </div>
         </div>
+
+        {siteSettings.footerShowCopyright !== "false" ? (
+          <div className="border-t border-white/10">
+            <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-6 text-xs text-white/55 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+              <p>
+                {siteSettings.footerCopyrightText ||
+                  `© ${new Date().getFullYear()} ${siteName}. All Rights Reserved.`}
+              </p>
+
+              {siteSettings.footerCreditText ? (
+                siteSettings.footerCreditUrl ? (
+                  <a
+                    href={siteSettings.footerCreditUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="transition hover:text-white"
+                  >
+                    {siteSettings.footerCreditText}
+                  </a>
+                ) : (
+                  <p>{siteSettings.footerCreditText}</p>
+                )
+              ) : null}
+            </div>
+          </div>
+        ) : null}
       </footer>
     </div>
   );

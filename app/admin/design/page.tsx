@@ -49,6 +49,18 @@ export default async function AdminDesignPage({ searchParams }: Props) {
           <span className="text-xl text-zinc-400">→</span>
         </Link>
 
+        <Link
+          href="/admin/design/footer"
+          className="mb-6 flex items-center justify-between rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:border-zinc-300 hover:shadow-md"
+        >
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">Footer Module 1</p>
+            <h2 className="mt-1 text-lg font-bold text-zinc-950">Footer Design</h2>
+            <p className="mt-1 text-sm text-zinc-600">Burgundy footer layout, sections and content.</p>
+          </div>
+          <span className="text-xl text-zinc-400">→</span>
+        </Link>
+
         {query.saved === "1" ? (
           <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
             Design settings saved.

@@ -31,6 +31,19 @@ export type SiteSettings = {
   layoutShowBottomCta: string;
   layoutHeroStyle: string;
   layoutCardStyle: string;
+  footerStyle: string;
+  footerShowBrand: string;
+  footerShowQuickLinks: string;
+  footerShowSocials: string;
+  footerShowOffice: string;
+  footerShowEmail: string;
+  footerShowCopyright: string;
+  footerBrandText: string;
+  footerOfficeTitle: string;
+  footerOfficeAddress: string;
+  footerCopyrightText: string;
+  footerCreditText: string;
+  footerCreditUrl: string;
 };
 
 const defaults: SiteSettings = {
@@ -63,6 +76,19 @@ const defaults: SiteSettings = {
   layoutShowBottomCta: "true",
   layoutHeroStyle: "brand",
   layoutCardStyle: "elevated",
+  footerStyle: "burgundy",
+  footerShowBrand: "true",
+  footerShowQuickLinks: "true",
+  footerShowSocials: "true",
+  footerShowOffice: "true",
+  footerShowEmail: "true",
+  footerShowCopyright: "true",
+  footerBrandText: "",
+  footerOfficeTitle: "Office",
+  footerOfficeAddress: "",
+  footerCopyrightText: "",
+  footerCreditText: "",
+  footerCreditUrl: "",
 };
 
 const settingMap = {
@@ -95,6 +121,19 @@ const settingMap = {
   "layout.showBottomCta": "layoutShowBottomCta",
   "layout.heroStyle": "layoutHeroStyle",
   "layout.cardStyle": "layoutCardStyle",
+  "footer.style": "footerStyle",
+  "footer.showBrand": "footerShowBrand",
+  "footer.showQuickLinks": "footerShowQuickLinks",
+  "footer.showSocials": "footerShowSocials",
+  "footer.showOffice": "footerShowOffice",
+  "footer.showEmail": "footerShowEmail",
+  "footer.showCopyright": "footerShowCopyright",
+  "footer.brandText": "footerBrandText",
+  "footer.officeTitle": "footerOfficeTitle",
+  "footer.officeAddress": "footerOfficeAddress",
+  "footer.copyrightText": "footerCopyrightText",
+  "footer.creditText": "footerCreditText",
+  "footer.creditUrl": "footerCreditUrl",
 } as const;
 
 async function loadSiteSettings(): Promise<SiteSettings> {

@@ -342,3 +342,37 @@ textarea {
 
 .sira-public[data-card-style="flat"] .sira-card { box-shadow: none; }
 .sira-public[data-card-style="bordered"] .sira-card { box-shadow: none; border-width: 2px; }
+
+
+/* === SIRA Footer Design Module 1 === */
+
+.sira-footer {
+  background:
+    radial-gradient(circle at 8% 12%, rgba(255,255,255,0.10), transparent 28%),
+    radial-gradient(circle at 92% 90%, rgba(255,255,255,0.06), transparent 24%),
+    linear-gradient(135deg, #651138 0%, #3a0b25 42%, #170711 100%);
+}
+
+.sira-footer[data-footer-style="dark"] {
+  background: #09090b;
+}
+
+.sira-footer[data-footer-style="light"] {
+  background: #ffffff;
+  color: #18181b;
+}
+
+.sira-footer[data-footer-style="light"] h2,
+.sira-footer[data-footer-style="light"] a {
+  color: #18181b;
+}
+
+.sira-footer[data-footer-style="minimal"] {
+  background: #f4f4f5;
+  color: #18181b;
+}
+
+.sira-footer[data-footer-style="minimal"] h2,
+.sira-footer[data-footer-style="minimal"] a {
+  color: #18181b;
+}
