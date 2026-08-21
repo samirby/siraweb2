@@ -109,20 +109,7 @@ export async function HomepagePostsSection() {
           <div className={`mt-10 grid gap-5 ${gridClass}`}>
             {visiblePosts.map((post) => {
               const date = post.publishedAt ?? post.createdAt;
-              const sentenceCount = Math.min(
-                10,
-                Math.max(
-                  1,
-                  Number.parseInt(
-                    settings.homePostsExcerptSentences || "10",
-                    10,
-                  ) || 10,
-                ),
-              );
-
-              const previewText =
-                post.excerpt?.trim() ||
-                firstSentences(post.content || "", sentenceCount);
+              const previewText = post.excerpt?.trim() || "";
 
               return (
                 <article
