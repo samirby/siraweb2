@@ -3,6 +3,7 @@ import path from "node:path";
 import { mkdir, unlink, writeFile } from "node:fs/promises";
 
 import { NextResponse } from "next/server";
+import { imageSize } from "image-size-next";
 
 import { getApiUserWithPermission } from "@/lib/auth/api-user";
 import { prisma } from "@/lib/db/prisma";
@@ -24,6 +25,30 @@ function cleanText(value: FormDataEntryValue | null, maxLength: number) {
   return typeof value === "string"
     ? value.trim().slice(0, maxLength)
     : "";
+}
+
+
+function getImageDimensions(bytes: Buffer) {
+  try {
+    const dimensions = imageSize(bytes);
+
+    const width =
+      typeof dimensions.width === "number" && dimensions.width > 0
+        ? dimensions.width
+        : null;
+
+    const height =
+      typeof dimensions.height === "number" && dimensions.height > 0
+        ? dimensions.height
+        : null;
+
+    return { width, height };
+  } catch {
+    return {
+      width: null,
+      height: null,
+    };
+  }
 }
 
 export async function POST(request: Request) {
@@ -103,6 +128,8 @@ export async function POST(request: Request) {
   await mkdir(targetDirectory, { recursive: true });
 
   const bytes = Buffer.from(await file.arrayBuffer());
+  const { width, height } = getImageDimensions(bytes);
+
   await writeFile(targetPath, bytes, { flag: "wx" });
 
   const originalName = file.name.trim().slice(0, 255) || filename;
@@ -125,6 +152,8 @@ export async function POST(request: Request) {
         mimeType: file.type,
         extension,
         sizeBytes: BigInt(file.size),
+        width,
+        height,
         altText,
         caption,
         folder,
@@ -149,6 +178,8 @@ export async function POST(request: Request) {
           originalName: updated.originalName,
           mimeType: updated.mimeType,
           sizeBytes: updated.sizeBytes.toString(),
+          width: updated.width,
+          height: updated.height,
           folder: updated.folder,
           path: updated.path,
         },
