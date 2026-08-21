@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
+import Image from "next/image";
 
 import { PublicShell } from "@/app/_components/public-shell";
 import { JsonLd } from "@/app/_components/seo/json-ld";
@@ -199,11 +200,16 @@ export default async function PublicPost({
 
           {post.featuredMedia?.type === "IMAGE" ? (
             <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-              <img
-                src={post.featuredMedia.url}
-                alt={post.featuredMedia.altText || post.title}
-                className="aspect-[16/9] w-full rounded-3xl object-cover"
-              />
+              <div className="relative aspect-[16/9] overflow-hidden rounded-3xl">
+                <Image
+                  src={post.featuredMedia.url}
+                  alt={post.featuredMedia.altText || post.title}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 960px"
+                  className="object-cover"
+                />
+              </div>
             </div>
           ) : null}
 
@@ -236,12 +242,18 @@ export default async function PublicPost({
 
                 <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {post.gallery.map((item) => (
-                    <img
+                    <div
                       key={item.id.toString()}
-                      src={item.media.url}
-                      alt={item.media.altText || post.title}
-                      className="aspect-square w-full rounded-2xl object-cover"
-                    />
+                      className="relative aspect-square overflow-hidden rounded-2xl"
+                    >
+                      <Image
+                        src={item.media.url}
+                        alt={item.media.altText || post.title}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
                   ))}
                 </div>
               </section>

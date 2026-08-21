@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 
 import { PublicShell } from "@/app/_components/public-shell";
 import { prisma } from "@/lib/db/prisma";
@@ -290,11 +291,16 @@ export default async function PublicPostsPage({
                   className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm"
                 >
                   {post.featuredMedia?.type === "IMAGE" ? (
-                    <Link href={`/posts/${post.slug}`}>
-                      <img
+                    <Link
+                      href={`/posts/${post.slug}`}
+                      className="relative block aspect-[16/9] overflow-hidden"
+                    >
+                      <Image
                         src={post.featuredMedia.url}
                         alt={post.featuredMedia.altText || post.title}
-                        className="aspect-[16/9] w-full object-cover"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                        className="object-cover"
                       />
                     </Link>
                   ) : (

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { unstable_cache } from "next/cache";
+import Image from "next/image";
 
 import { prisma } from "@/lib/db/prisma";
 import { getSiteSettings } from "@/lib/settings/site-settings";
@@ -141,10 +142,13 @@ export async function PublicShell({
             aria-label={siteName}
           >
             {siteSettings.logoMediaId ? (
-              <img
+              <Image
                 src={`/media/${siteSettings.logoMediaId}`}
                 alt={siteName}
-                className="max-h-10 max-w-[220px] object-contain"
+                width={220}
+                height={40}
+                sizes="220px"
+                className="h-10 w-auto max-w-[220px] object-contain"
               />
             ) : (
               <span className="text-lg font-bold tracking-tight">

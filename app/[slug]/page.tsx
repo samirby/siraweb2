@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
+import Image from "next/image";
 
 import { PublicShell } from "@/app/_components/public-shell";
 import { prisma } from "@/lib/db/prisma";
@@ -138,11 +139,16 @@ export default async function PublicPage({
 
         {page.featuredMedia?.type === "IMAGE" ? (
           <div className="mx-auto max-w-5xl px-4 pt-10 sm:px-6 lg:px-8">
-            <img
-              src={page.featuredMedia.url}
-              alt={page.featuredMedia.altText || page.title}
-              className="aspect-[16/8] w-full rounded-3xl object-cover"
-            />
+            <div className="relative aspect-[16/8] overflow-hidden rounded-3xl">
+              <Image
+                src={page.featuredMedia.url}
+                alt={page.featuredMedia.altText || page.title}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 960px"
+                className="object-cover"
+              />
+            </div>
           </div>
         ) : null}
 
@@ -162,11 +168,15 @@ export default async function PublicPage({
                     className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm"
                   >
                     {post.featuredMedia?.type === "IMAGE" ? (
-                      <img
-                        src={post.featuredMedia.url}
-                        alt={post.featuredMedia.altText || post.title}
-                        className="aspect-[16/9] w-full object-cover"
-                      />
+                      <div className="relative aspect-[16/9] overflow-hidden">
+                        <Image
+                          src={post.featuredMedia.url}
+                          alt={post.featuredMedia.altText || post.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                          className="object-cover"
+                        />
+                      </div>
                     ) : null}
 
                     <div className="p-5">
