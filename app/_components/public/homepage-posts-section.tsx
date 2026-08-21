@@ -52,17 +52,24 @@ export async function HomepagePostsSection() {
         { publishedAt: { lte: now } },
       ],
     },
-    orderBy: [
-      { publishedAt: "desc" },
-      { createdAt: "desc" },
-    ],
-    take: clampCount(settings.homePostsCount),
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 50,
     include: {
       author: { select: { name: true } },
       category: true,
       featuredMedia: true,
     },
   });
+
+  const visiblePosts = posts
+    .sort((a, b) => {
+      const aDate = (a.publishedAt ?? a.createdAt).getTime();
+      const bDate = (b.publishedAt ?? b.createdAt).getTime();
+      return bDate - aDate;
+    })
+    .slice(0, clampCount(settings.homePostsCount));
 
   const gridClass =
     settings.homePostsLayout === "grid2"
@@ -98,9 +105,9 @@ export async function HomepagePostsSection() {
           </Link>
         </div>
 
-        {posts.length ? (
+        {visiblePosts.length ? (
           <div className={`mt-10 grid gap-5 ${gridClass}`}>
-            {posts.map((post) => {
+            {visiblePosts.map((post) => {
               const date = post.publishedAt ?? post.createdAt;
               const sentenceCount = Math.min(
                 10,
