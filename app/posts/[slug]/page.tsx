@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { PublicShell } from "@/app/_components/public-shell";
+import { JsonLd } from "@/app/_components/seo/json-ld";
 import { prisma } from "@/lib/db/prisma";
 import { getSiteBaseUrl } from "@/lib/seo/site-url";
+import { getSiteSettings } from "@/lib/settings/site-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -103,14 +105,65 @@ export default async function PublicPost({
   params,
 }: Props) {
   const { slug } = await params;
-  const post = await getPublishedPost(slug);
+
+  const [post, settings, baseUrl] = await Promise.all([
+    getPublishedPost(slug),
+    getSiteSettings(),
+    getSiteBaseUrl(),
+  ]);
 
   if (!post) {
     notFound();
   }
 
+  const canonical =
+    post.canonicalUrl ||
+    (baseUrl ? `${baseUrl}/posts/${post.slug}` : undefined);
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description:
+      post.seoDescription ||
+      post.excerpt ||
+      undefined,
+    datePublished:
+      post.publishedAt?.toISOString() ||
+      post.createdAt.toISOString(),
+    dateModified: post.updatedAt.toISOString(),
+    mainEntityOfPage: canonical
+      ? {
+          "@type": "WebPage",
+          "@id": canonical,
+        }
+      : undefined,
+    author: {
+      "@type": "Person",
+      name: post.author.name,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: settings.siteName,
+      url: settings.siteUrl || baseUrl || undefined,
+      logo: settings.logoMediaId
+        ? {
+            "@type": "ImageObject",
+            url: baseUrl
+              ? `${baseUrl}/media/${settings.logoMediaId}`
+              : `/media/${settings.logoMediaId}`,
+          }
+        : undefined,
+    },
+    image:
+      post.featuredMedia?.type === "IMAGE"
+        ? [post.featuredMedia.url]
+        : undefined,
+  };
+
   return (
     <PublicShell>
+      <JsonLd data={articleSchema} />
       <main className="min-h-[70vh] bg-white">
         <article>
           <header className="mx-auto max-w-4xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">

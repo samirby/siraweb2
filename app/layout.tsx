@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { getSiteSettings } from "@/lib/settings/site-settings";
+import { JsonLd } from "@/app/_components/seo/json-ld";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -63,13 +64,31 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({
+  children,
+}: LayoutProps<"/">) {
+  const settings = await getSiteSettings();
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: settings.siteName,
+    url: settings.siteUrl || undefined,
+    description:
+      settings.siteDescription ||
+      settings.seoDefaultDescription ||
+      undefined,
+  };
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <JsonLd data={websiteSchema} />
+        {children}
+      </body>
     </html>
   );
 }
