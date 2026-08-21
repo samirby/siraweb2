@@ -189,9 +189,9 @@ export async function PublicShell({
 
             <Link
               href="/contact"
-              className="public-button-primary px-4 py-2.5"
+              className="sira-red-button px-4 py-2.5"
             >
-              Contact
+              Bëhu Anëtar
             </Link>
           </div>
 

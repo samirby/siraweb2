@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
-import { PublicPostCard } from "@/app/_components/public/public-post-card";
+import { HomepagePostsSection } from "@/app/_components/public/homepage-posts-section";
 import { PublicShell } from "@/app/_components/public-shell";
 import { prisma } from "@/lib/db/prisma";
 import { getSiteSettings } from "@/lib/settings/site-settings";
-import { HomepagePostsSection } from "@/app/_components/public/homepage-posts-section";
 
 export const revalidate = 60;
 
@@ -14,256 +13,213 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
 
   return {
-    title: settings.seoDefaultTitle || settings.siteName,
+    title:
+      settings.seoDefaultTitle ||
+      settings.siteName ||
+      "Shoqata e Mjekëve Shqiptarë Austri",
     description:
       settings.seoDefaultDescription ||
       settings.siteDescription ||
-      undefined,
+      "Shoqata e Mjekëve Shqiptarë Austri.",
   };
 }
 
 export default async function Home() {
   const now = new Date();
 
-  const [settings, posts, services, categories] = await Promise.all([
+  const [settings, visualPosts] = await Promise.all([
     getSiteSettings(),
     prisma.post.findMany({
       where: {
         status: "PUBLISHED",
         OR: [{ publishedAt: null }, { publishedAt: { lte: now } }],
+        featuredMediaId: { not: null },
       },
-      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
-      take: 6,
-      include: {
-        author: { select: { name: true } },
-        category: true,
-        featuredMedia: true,
-      },
-    }),
-    prisma.page.findMany({
-      where: {
-        status: "PUBLISHED",
-        pageType: "SERVICE",
-        OR: [{ publishedAt: null }, { publishedAt: { lte: now } }],
-      },
-      orderBy: { updatedAt: "desc" },
-      take: 6,
-      include: { featuredMedia: true },
-    }),
-    prisma.category.findMany({
-      orderBy: { name: "asc" },
+      orderBy: { createdAt: "desc" },
       take: 8,
       include: {
-        _count: { select: { posts: true } },
+        featuredMedia: true,
       },
     }),
   ]);
 
-  const leadPost = posts[0] ?? null;
-  const latestPosts = posts.slice(0, 3);
+  const heroMedia =
+    visualPosts.find((post) => post.featuredMedia?.type === "IMAGE")
+      ?.featuredMedia ?? null;
+
+  const welcomeMedia =
+    visualPosts.find(
+      (post) =>
+        post.featuredMedia?.type === "IMAGE" &&
+        post.featuredMedia.id !== heroMedia?.id,
+    )?.featuredMedia ?? heroMedia;
 
   return (
     <PublicShell>
-      <main>
-        <section className="sira-hero relative overflow-hidden text-white">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_34%)]" />
-          <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:px-8 lg:py-28">
-            <div>
-              <p className="inline-flex rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300">
-                {settings.siteName}
+      <main className="bg-[#fbfaf7]">
+        <section className="sira-doctors-hero">
+          <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:px-8 lg:py-20">
+            <div className="order-2 lg:order-1">
+              <p className="sira-doctors-eyebrow">
+                Shoqata e Mjekëve Shqiptarë Austri
               </p>
 
-              <h1 className="mt-6 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
-                {settings.siteDescription ||
-                  "Modern solutions, useful content and a better digital experience."}
+              <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[1.03] tracking-[-0.04em] text-zinc-950 sm:text-6xl lg:text-7xl">
+                Bashkë për shëndetin, dijen dhe komunitetin
               </h1>
 
-              <p className="mt-6 max-w-2xl text-base leading-7 text-zinc-300 sm:text-lg sm:leading-8">
-                Explore our services, latest articles and practical resources.
+              <div className="mt-6 h-[2px] w-16 bg-red-600" />
+
+              <p className="mt-6 max-w-xl text-base leading-8 text-zinc-600 sm:text-lg">
+                Ne bashkojmë mjekët shqiptarë në Austri për të promovuar
+                shkencën mjekësore, zhvillimin profesional, bashkëpunimin dhe
+                kontributin në shëndetin e shoqërisë.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/contact" className="public-button-light">
-                  Contact us
+                <Link href="/contact" className="sira-red-button">
+                  Mëso më shumë <span aria-hidden="true">→</span>
                 </Link>
-                <Link href="/posts" className="public-button-dark-outline">
-                  Explore articles
+
+                <Link href="/posts" className="sira-outline-button">
+                  Shiko artikujt
                 </Link>
+              </div>
+
+              <div className="mt-10 grid gap-4 sm:grid-cols-3">
+                {[
+                  ["Komunitet i Bashkuar", "Mjekë shqiptarë në Austri"],
+                  ["Zhvillim Profesional", "Trajnime & konferenca"],
+                  ["Kontribut në Shoqëri", "Shëndet, edukim, humanizëm"],
+                ].map(([title, description]) => (
+                  <div key={title} className="flex items-start gap-3">
+                    <span className="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-full border border-red-200 bg-red-50 text-red-600">
+                      +
+                    </span>
+                    <div>
+                      <p className="text-xs font-bold text-zinc-950">{title}</p>
+                      <p className="mt-1 text-[11px] leading-5 text-zinc-500">
+                        {description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="relative">
-              {leadPost?.featuredMedia?.type === "IMAGE" ? (
-                <Link
-                  href={`/posts/${leadPost.slug}`}
-                  className="relative block aspect-[4/3] overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl"
-                >
+            <div className="order-1 lg:order-2">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] bg-[#eee9e2] shadow-[0_24px_70px_rgba(0,0,0,0.08)]">
+                {heroMedia?.type === "IMAGE" ? (
                   <Image
-                    src={leadPost.featuredMedia.url}
-                    alt={leadPost.featuredMedia.altText || leadPost.title}
+                    src={heroMedia.url}
+                    alt={
+                      heroMedia.altText ||
+                      "Shoqata e Mjekëve Shqiptarë Austri"
+                    }
                     fill
                     priority
-                    sizes="(max-width: 1024px) 100vw, 48vw"
+                    sizes="(max-width: 1024px) 100vw, 52vw"
                     className="object-cover"
                   />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-6 pt-20">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-300">
-                      Latest story
-                    </p>
-                    <h2 className="mt-2 text-2xl font-bold leading-tight">
-                      {leadPost.title}
-                    </h2>
-                  </div>
-                </Link>
-              ) : (
-                <div className="grid aspect-[4/3] place-items-center rounded-[2rem] border border-white/10 bg-white/5 p-8 text-center">
-                  <div>
-                    <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-white text-2xl font-black text-zinc-950">
-                      S
+                ) : (
+                  <div className="absolute inset-0 grid place-items-center p-8 text-center">
+                    <div>
+                      <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-white text-3xl font-black text-red-600 shadow-sm">
+                        +
+                      </div>
+                      <p className="mt-5 text-sm leading-6 text-zinc-500">
+                        Shto një imazh featured në një postim për ta përdorur si
+                        vizual të Hero Section.
+                      </p>
                     </div>
-                    <p className="mt-5 text-sm leading-6 text-zinc-400">
-                      Publish a featured article to automatically populate this visual.
-                    </p>
                   </div>
-                </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-y border-black/5 bg-[#f5f0e8]">
+          <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:px-8 lg:py-24">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-[1.75rem] bg-white shadow-sm">
+              {welcomeMedia?.type === "IMAGE" ? (
+                <Image
+                  src={welcomeMedia.url}
+                  alt={welcomeMedia.altText || "Mirë se vini"}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 48vw"
+                  className="object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(220,38,38,0.12),transparent_26%),linear-gradient(135deg,#fff,#efe8de)]" />
               )}
             </div>
-          </div>
-        </section>
 
-        <section className="border-b border-zinc-200 bg-white">
-          <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-3 lg:px-8">
-            {[
-              ["Professional", "Clear structure, quality content and polished presentation."],
-              ["Responsive", "Designed to work naturally across desktop, tablet and mobile."],
-              ["Built to grow", "Pages, posts, media and menus are managed from the CMS."],
-            ].map(([title, description], index) => (
-              <div key={title} className="flex gap-4">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-zinc-950 text-sm font-bold text-white">
-                  0{index + 1}
-                </span>
-                <div>
-                  <h2 className="font-bold text-zinc-950">{title}</h2>
-                  <p className="mt-1 text-sm leading-6 text-zinc-600">{description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+            <div className="lg:pl-6">
+              <p className="sira-doctors-eyebrow">Mirë se vini</p>
 
-        {services.length ? (
-          <section className="sira-soft-section">
-            <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-              <div className="public-section-heading">
-                <div>
-                  <p className="public-eyebrow">Services</p>
-                  <h2 className="public-section-title">What we can help you with</h2>
-                </div>
+              <h2 className="mt-4 max-w-xl text-3xl font-black leading-tight tracking-[-0.035em] text-zinc-950 sm:text-5xl">
+                Mirë se vini në Shoqatën e Mjekëve Shqiptarë Austri
+              </h2>
+
+              <div className="mt-6 h-[2px] w-16 bg-red-600" />
+
+              <div className="mt-7 max-w-2xl space-y-5 text-base leading-8 text-zinc-600">
+                <p>
+                  Shoqata jonë është një organizatë jofitimprurëse që synon të
+                  forcojë lidhjet mes mjekëve shqiptarë në Austri, të nxisë
+                  bashkëpunimin profesional dhe të kontribuojë në avancimin e
+                  kujdesit shëndetësor.
+                </p>
+
+                <p>
+                  Përmes aktiviteteve shkencore, edukative dhe humanitare,
+                  synojmë të jemi një zë i fuqishëm dhe një pikë referimi për
+                  komunitetin dhe shoqërinë.
+                </p>
               </div>
 
-              <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                {services.map((service) => (
-                  <Link
-                    key={service.id.toString()}
-                    href={`/${service.slug}`}
-                    className="sira-card group overflow-hidden"
-                  >
-                    {service.featuredMedia?.type === "IMAGE" ? (
-                      <div className="relative aspect-[16/9] overflow-hidden">
-                        <Image
-                          src={service.featuredMedia.url}
-                          alt={service.featuredMedia.altText || service.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          className="object-cover transition duration-500 group-hover:scale-[1.03]"
-                        />
-                      </div>
-                    ) : null}
-
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold text-zinc-950">{service.title}</h3>
-                      {service.excerpt ? (
-                        <p className="mt-3 line-clamp-3 text-sm leading-6 text-zinc-600">
-                          {service.excerpt}
-                        </p>
-                      ) : null}
-                      <span className="mt-5 inline-block text-sm font-semibold text-zinc-950">
-                        Learn more →
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </section>
-        ) : null}
-
-        {categories.length ? (
-          <section className="border-y border-zinc-200 bg-white">
-            <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-              <p className="public-eyebrow">Explore</p>
-              <div className="mt-5 flex flex-wrap gap-3">
-                {categories.map((category) => (
-                  <Link
-                    key={category.id.toString()}
-                    href={`/category/${category.slug}`}
-                    className="rounded-full border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:border-zinc-950 hover:bg-zinc-950 hover:text-white"
-                  >
-                    {category.name}
-                    <span className="ml-2 text-xs opacity-60">
-                      {category._count.posts}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </section>
-        ) : null}
-
-        <section className="bg-white">
-          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-            <div className="public-section-heading">
-              <div>
-                <p className="public-eyebrow">Latest</p>
-                <h2 className="public-section-title">Latest articles</h2>
-              </div>
-              <Link href="/posts" className="public-button-secondary">
-                View all posts
+              <Link href="/contact" className="sira-outline-button mt-8">
+                Më shumë rreth nesh <span aria-hidden="true">→</span>
               </Link>
             </div>
-
-            {latestPosts.length ? (
-              <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {latestPosts.map((post) => (
-                  <PublicPostCard key={post.id.toString()} post={post} />
-                ))}
-              </div>
-            ) : (
-              <div className="mt-8 rounded-[1.5rem] border border-dashed border-zinc-300 bg-zinc-50 p-10 text-center text-sm text-zinc-500">
-                Published posts will appear here automatically.
-              </div>
-            )}
           </div>
         </section>
 
-        <section className="sira-hero text-white">
-          <div className="mx-auto flex max-w-7xl flex-col gap-7 px-4 py-14 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-                Get in touch
-              </p>
-              <h2 className="mt-2 max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
-                Have a question or a project in mind?
-              </h2>
+        <HomepagePostsSection />
+
+        <section className="bg-[#fbfaf7]">
+          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+            <div className="sira-membership-cta">
+              <div className="flex items-start gap-5">
+                <div className="hidden h-16 w-16 shrink-0 place-items-center rounded-full border border-red-200 bg-red-50 text-2xl font-black text-red-600 sm:grid">
+                  +
+                </div>
+
+                <div>
+                  <p className="sira-doctors-eyebrow">Anëtarësia</p>
+                  <h2 className="mt-2 max-w-2xl text-3xl font-black tracking-[-0.035em] text-zinc-950 sm:text-4xl">
+                    Bëhu pjesë e komunitetit tonë
+                  </h2>
+                  <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-600 sm:text-base">
+                    Bashkohu me ne dhe përfito nga aktivitetet, trajnimet,
+                    konferencat dhe mundësitë ekskluzive për anëtarët.
+                  </p>
+                </div>
+              </div>
+
+              <div className="shrink-0">
+                <Link href="/contact" className="sira-red-button">
+                  Bëhu anëtar tani <span aria-hidden="true">→</span>
+                </Link>
+                <p className="mt-3 text-xs text-zinc-500">
+                  Anëtarësimi është i hapur për profesionistët e interesuar.
+                </p>
+              </div>
             </div>
-            <Link href="/contact" className="public-button-light shrink-0">
-              Contact us
-            </Link>
           </div>
         </section>
-            <HomepagePostsSection />
-
-</main>
+      </main>
     </PublicShell>
   );
 }
