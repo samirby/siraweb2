@@ -16,6 +16,14 @@ export type SiteSettings = {
   xUrl: string;
   logoMediaId: string;
   faviconMediaId: string;
+  designPrimaryColor: string;
+  designSecondaryColor: string;
+  designBackgroundColor: string;
+  designTextColor: string;
+  designHeadingFont: string;
+  designBodyFont: string;
+  designBorderRadius: string;
+  designContainerWidth: string;
 };
 
 const defaults: SiteSettings = {
@@ -33,6 +41,14 @@ const defaults: SiteSettings = {
   xUrl: "",
   logoMediaId: "",
   faviconMediaId: "",
+  designPrimaryColor: "#09090b",
+  designSecondaryColor: "#52525b",
+  designBackgroundColor: "#ffffff",
+  designTextColor: "#18181b",
+  designHeadingFont: "Arial",
+  designBodyFont: "Arial",
+  designBorderRadius: "16px",
+  designContainerWidth: "1280px",
 };
 
 const settingMap = {
@@ -50,6 +66,14 @@ const settingMap = {
   "social.x": "xUrl",
   "branding.logoMediaId": "logoMediaId",
   "branding.faviconMediaId": "faviconMediaId",
+  "design.primaryColor": "designPrimaryColor",
+  "design.secondaryColor": "designSecondaryColor",
+  "design.backgroundColor": "designBackgroundColor",
+  "design.textColor": "designTextColor",
+  "design.headingFont": "designHeadingFont",
+  "design.bodyFont": "designBodyFont",
+  "design.borderRadius": "designBorderRadius",
+  "design.containerWidth": "designContainerWidth",
 } as const;
 
 async function loadSiteSettings(): Promise<SiteSettings> {

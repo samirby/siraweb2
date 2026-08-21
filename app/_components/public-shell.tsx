@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { unstable_cache } from "next/cache";
 import Image from "next/image";
@@ -91,6 +92,17 @@ export async function PublicShell({
 
   const siteName = siteSettings.siteName;
 
+  const themeStyle = {
+    "--sira-primary": siteSettings.designPrimaryColor,
+    "--sira-secondary": siteSettings.designSecondaryColor,
+    "--sira-background": siteSettings.designBackgroundColor,
+    "--sira-text": siteSettings.designTextColor,
+    "--sira-heading-font": siteSettings.designHeadingFont,
+    "--sira-body-font": siteSettings.designBodyFont,
+    "--sira-radius": siteSettings.designBorderRadius,
+    "--sira-container": siteSettings.designContainerWidth,
+  } as CSSProperties;
+
   const topMenu = menus.find((menu) => menu.location === "TOP");
   const secondaryMenu = menus.find(
     (menu) => menu.location === "SECONDARY",
@@ -116,7 +128,10 @@ export async function PublicShell({
     })) ?? [];
 
   return (
-    <div className="min-h-screen bg-white text-zinc-950 selection:bg-zinc-950 selection:text-white">
+    <div
+      style={themeStyle}
+      className="sira-public min-h-screen selection:bg-zinc-950 selection:text-white"
+    >
       {secondaryMenu?.items.length ? (
         <div className="hidden border-b border-zinc-800 bg-zinc-950 text-zinc-300 md:block">
           <div className="mx-auto flex min-h-9 max-w-7xl items-center justify-end gap-4 px-4 text-xs sm:px-6 lg:px-8">

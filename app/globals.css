@@ -12,13 +12,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-
 html {
   scroll-behavior: smooth;
 }
@@ -221,4 +214,38 @@ textarea {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+
+.sira-public {
+  background: var(--sira-background, #ffffff);
+  color: var(--sira-text, #18181b);
+  font-family: var(--sira-body-font, Arial), var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+.sira-public h1,
+.sira-public h2,
+.sira-public h3,
+.sira-public h4,
+.sira-public h5,
+.sira-public h6 {
+  font-family: var(--sira-heading-font, Arial), var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+.sira-public .public-button-primary {
+  background: var(--sira-primary, #09090b);
+  border-radius: var(--sira-radius, 16px);
+}
+
+.sira-public .public-button-primary:hover {
+  filter: brightness(1.15);
+}
+
+.sira-public .public-button-secondary,
+.sira-public .public-input {
+  border-radius: var(--sira-radius, 16px);
+}
+
+.sira-public .public-section-title {
+  color: var(--sira-text, #09090b);
 }

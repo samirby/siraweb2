@@ -72,6 +72,9 @@ export function PublicMobileNav({
           />
 
           <aside
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile navigation"
             className={`absolute inset-y-0 right-0 z-[10000] flex w-[86vw] max-w-[340px] flex-col bg-white shadow-2xl transition-[transform,opacity] duration-200 ease-out ${
               open
                 ? "translate-x-0 opacity-100"
