@@ -4,6 +4,11 @@ import bcrypt from "bcryptjs";
 
 import { authConfig } from "@/auth.config";
 import { prisma } from "@/lib/db/prisma";
+import {
+  canAttemptLogin,
+  recordLoginFailure,
+  resetLoginFailures,
+} from "@/lib/security/login-rate-limit";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -34,6 +39,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           return null;
         }
 
+        const loginLimit = canAttemptLogin(email);
+
+        if (!loginLimit.allowed) {
+          return null;
+        }
+
         const user = await prisma.user.findUnique({
           where: { email },
           include: {
@@ -42,6 +53,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         });
 
         if (!user || user.status !== "ACTIVE") {
+          recordLoginFailure(email);
           return null;
         }
 
@@ -51,8 +63,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         );
 
         if (!passwordMatches) {
+          recordLoginFailure(email);
           return null;
         }
+
+        resetLoginFailures(email);
 
         await prisma.user.update({
           where: { id: user.id },

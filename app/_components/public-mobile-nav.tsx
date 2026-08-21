@@ -23,11 +23,8 @@ export function PublicMobileNav({
   secondaryItems,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") setOpen(false);
     }
@@ -57,8 +54,7 @@ export function PublicMobileNav({
     };
   }, [open]);
 
-  const drawer = mounted
-    ? createPortal(
+  const drawer = createPortal(
         <div
           className={`fixed inset-0 z-[9999] transition-[visibility] duration-200 md:hidden ${
             open ? "visible" : "invisible"
@@ -140,8 +136,7 @@ export function PublicMobileNav({
           </aside>
         </div>,
         document.body,
-      )
-    : null;
+      );
 
   return (
     <>

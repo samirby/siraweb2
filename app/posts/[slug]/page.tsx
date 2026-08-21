@@ -6,6 +6,7 @@ import { JsonLd } from "@/app/_components/seo/json-ld";
 import { prisma } from "@/lib/db/prisma";
 import { getSiteBaseUrl } from "@/lib/seo/site-url";
 import { getSiteSettings } from "@/lib/settings/site-settings";
+import { sanitizeRichHtml } from "@/lib/security/sanitize-rich-html";
 
 export const dynamic = "force-dynamic";
 
@@ -210,7 +211,7 @@ export default async function PublicPost({
               <div
                 className="rich-post-content text-base leading-8 text-zinc-700"
                 dangerouslySetInnerHTML={{
-                  __html: post.content,
+                  __html: sanitizeRichHtml(post.content),
                 }}
               />
             ) : null}

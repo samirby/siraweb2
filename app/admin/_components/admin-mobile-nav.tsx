@@ -14,7 +14,6 @@ export function AdminMobileNav({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   const visibleNavItems = adminNavItems.filter(
     (item) =>
@@ -23,8 +22,6 @@ export function AdminMobileNav({
   );
 
   useEffect(() => {
-    setMounted(true);
-
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") setOpen(false);
     }
@@ -51,8 +48,7 @@ export function AdminMobileNav({
     };
   }, [open]);
 
-  const portal = mounted
-    ? createPortal(
+  const portal = createPortal(
         <div
           className={`fixed inset-0 z-[9999] transition-[visibility] duration-200 lg:hidden ${
             open ? "visible" : "invisible"
@@ -131,8 +127,7 @@ export function AdminMobileNav({
           </aside>
         </div>,
         document.body,
-      )
-    : null;
+      );
 
   return (
     <>

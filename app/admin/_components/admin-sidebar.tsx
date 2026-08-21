@@ -12,7 +12,13 @@ export function AdminSidebar({
   permissions: string[];
 }) {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+
+    return (
+      window.localStorage.getItem("sira-admin-sidebar-collapsed") === "true"
+    );
+  });
 
   const visibleNavItems = adminNavItems.filter(
     (item) =>
@@ -21,16 +27,11 @@ export function AdminSidebar({
   );
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("sira-admin-sidebar-collapsed");
-    const isCollapsed = stored === "true";
-
-    setCollapsed(isCollapsed);
-
     document.documentElement.style.setProperty(
       "--sira-admin-sidebar-width",
-      isCollapsed ? "5rem" : "16rem",
+      collapsed ? "5rem" : "16rem",
     );
-  }, []);
+  }, [collapsed]);
 
   function toggleSidebar() {
     setCollapsed((current) => {
@@ -38,11 +39,6 @@ export function AdminSidebar({
       window.localStorage.setItem(
         "sira-admin-sidebar-collapsed",
         String(next),
-      );
-
-      document.documentElement.style.setProperty(
-        "--sira-admin-sidebar-width",
-        next ? "5rem" : "16rem",
       );
 
       return next;
