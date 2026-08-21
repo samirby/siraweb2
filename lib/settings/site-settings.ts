@@ -55,6 +55,7 @@ export type SiteSettings = {
   homePostsShowAuthor: string;
   homePostsShowDate: string;
   homePostsButtonText: string;
+  homePostsExcerptSentences: string;
 };
 
 const defaults: SiteSettings = {
@@ -111,6 +112,7 @@ const defaults: SiteSettings = {
   homePostsShowAuthor: "true",
   homePostsShowDate: "true",
   homePostsButtonText: "View all articles",
+  homePostsExcerptSentences: "10",
 };
 
 const settingMap = {
@@ -167,6 +169,7 @@ const settingMap = {
   "homePosts.showAuthor": "homePostsShowAuthor",
   "homePosts.showDate": "homePostsShowDate",
   "homePosts.buttonText": "homePostsButtonText",
+  "homePosts.excerptSentences": "homePostsExcerptSentences",
 } as const;
 
 async function loadSiteSettings(): Promise<SiteSettings> {

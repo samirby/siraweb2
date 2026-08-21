@@ -155,6 +155,23 @@ export default async function AdminHomePostsPage({
                 </select>
               </label>
 
+              <label className="grid gap-2">
+                <span className="text-sm font-semibold text-zinc-800">
+                  Content preview sentences
+                </span>
+                <select
+                  name="excerptSentences"
+                  defaultValue={settings.homePostsExcerptSentences}
+                  className="rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-sm"
+                >
+                  {[3, 5, 8, 10].map((count) => (
+                    <option key={count} value={String(count)}>
+                      {count} sentences
+                    </option>
+                  ))}
+                </select>
+              </label>
+
               <label className="grid gap-2 sm:col-span-2">
                 <span className="text-sm font-semibold text-zinc-800">
                   Button text

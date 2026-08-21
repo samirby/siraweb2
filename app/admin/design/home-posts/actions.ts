@@ -39,6 +39,21 @@ export async function saveHomePostsSettings(formData: FormData) {
     ),
   );
 
+  const rawSentences = Number.parseInt(
+    String(formData.get("excerptSentences") ?? "10"),
+    10,
+  );
+
+  const excerptSentences = String(
+    Math.min(
+      10,
+      Math.max(
+        1,
+        Number.isFinite(rawSentences) ? rawSentences : 10,
+      ),
+    ),
+  );
+
   const values = {
     "homePosts.enabled": checkbox(formData, "enabled"),
     "homePosts.eyebrow": text(
@@ -76,6 +91,7 @@ export async function saveHomePostsSettings(formData: FormData) {
       "View all articles",
       80,
     ),
+    "homePosts.excerptSentences": excerptSentences,
   };
 
   await prisma.$transaction(

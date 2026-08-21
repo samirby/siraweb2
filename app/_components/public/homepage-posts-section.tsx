@@ -10,6 +10,29 @@ function clampCount(value: string) {
   return Math.min(12, Math.max(1, parsed));
 }
 
+function stripHtml(value: string) {
+  return value
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/\\s+/g, " ")
+    .trim();
+}
+
+function firstSentences(value: string, count: number) {
+  const clean = stripHtml(value);
+  if (!clean) return "";
+
+  const sentences =
+    clean.match(/[^.!?]+[.!?]+|[^.!?]+$/g)?.map((item) => item.trim()) ?? [];
+
+  return sentences.slice(0, count).join(" ");
+}
+
 export async function HomepagePostsSection() {
   const settings = await getSiteSettings();
 
@@ -79,6 +102,20 @@ export async function HomepagePostsSection() {
           <div className={`mt-10 grid gap-5 ${gridClass}`}>
             {posts.map((post) => {
               const date = post.publishedAt ?? post.createdAt;
+              const sentenceCount = Math.min(
+                10,
+                Math.max(
+                  1,
+                  Number.parseInt(
+                    settings.homePostsExcerptSentences || "10",
+                    10,
+                  ) || 10,
+                ),
+              );
+
+              const previewText =
+                post.excerpt?.trim() ||
+                firstSentences(post.content || "", sentenceCount);
 
               return (
                 <article
@@ -134,9 +171,9 @@ export async function HomepagePostsSection() {
                     </div>
 
                     {settings.homePostsShowExcerpt !== "false" &&
-                    post.excerpt ? (
-                      <p className="mt-5 line-clamp-4 text-sm leading-6 text-white/72">
-                        {post.excerpt}
+                    previewText ? (
+                      <p className="mt-5 text-sm leading-6 text-white/72">
+                        {previewText}
                       </p>
                     ) : null}
 
