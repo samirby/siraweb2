@@ -293,20 +293,13 @@ export async function deleteMediaAction(formData: FormData) {
     redirect("/admin/media");
   }
 
-  const usageCount =
-    media._count.userAvatars +
-    media._count.pageFeatured +
-    media._count.postFeatured +
-    media._count.postSecondary +
-    media._count.postGalleryItems;
-
-  if (usageCount > 0) {
-    redirect(
-      `/admin/media?library=${encodeURIComponent(
-        normalizeMediaFolder(media.folder),
-      )}&inUse=1`,
-    );
-  }
+  const usage = {
+    userAvatars: media._count.userAvatars,
+    pageFeatured: media._count.pageFeatured,
+    postFeatured: media._count.postFeatured,
+    postSecondary: media._count.postSecondary,
+    postGalleryItems: media._count.postGalleryItems,
+  };
 
   await prisma.media.delete({
     where: { id },
@@ -325,6 +318,8 @@ export async function deleteMediaAction(formData: FormData) {
       metadata: {
         originalName: media.originalName,
         folder: media.folder,
+        forceDelete: true,
+        detachedUsage: usage,
       },
     },
   });
