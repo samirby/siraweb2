@@ -1,3 +1,4 @@
+import { MediaPicker } from "@/app/admin/_components/media-picker";
 type PageFormValue = {
   id?: string;
   title?: string;
@@ -169,36 +170,20 @@ export function PageForm({
         </section>
 
         <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-bold text-zinc-950">Featured image</h2>
-
-          <select
+          <MediaPicker
             name="featuredMediaId"
+            label="Featured image"
+            items={media.map((item) => ({
+              id: item.id,
+              url: item.url,
+              name: item.originalName,
+              alt: item.altText,
+            }))}
             defaultValue={value?.featuredMediaId ?? ""}
-            className="mt-4 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm"
-          >
-            <option value="">No featured image</option>
-            {media.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.originalName}
-                {item.folder ? ` — ${item.folder}` : ""}
-              </option>
-            ))}
-          </select>
-
-          {value?.featuredMediaId ? (
-            <div className="mt-4">
-              {media
-                .filter((item) => item.id === value.featuredMediaId)
-                .map((item) => (
-                  <img
-                    key={item.id}
-                    src={item.url}
-                    alt={item.altText || item.originalName}
-                    className="aspect-[16/9] w-full rounded-xl border border-zinc-200 object-cover"
-                  />
-                ))}
-            </div>
-          ) : null}
+            folder="pages"
+            accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+            helpText="Choose an existing image from Media Library. If it is not there, upload it from your computer."
+          />
         </section>
 
         <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
