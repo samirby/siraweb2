@@ -13,6 +13,8 @@ export type SiteSettings = {
   instagramUrl: string;
   linkedinUrl: string;
   xUrl: string;
+  logoMediaId: string;
+  faviconMediaId: string;
 };
 
 const defaults: SiteSettings = {
@@ -28,6 +30,8 @@ const defaults: SiteSettings = {
   instagramUrl: "",
   linkedinUrl: "",
   xUrl: "",
+  logoMediaId: "",
+  faviconMediaId: "",
 };
 
 const settingMap = {
@@ -43,6 +47,8 @@ const settingMap = {
   "social.instagram": "instagramUrl",
   "social.linkedin": "linkedinUrl",
   "social.x": "xUrl",
+  "branding.logoMediaId": "logoMediaId",
+  "branding.faviconMediaId": "faviconMediaId",
 } as const;
 
 export async function getSiteSettings(): Promise<SiteSettings> {

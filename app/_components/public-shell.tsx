@@ -115,9 +115,20 @@ export async function PublicShell({
         <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <Link
             href="/"
-            className="text-lg font-bold tracking-tight"
+            className="flex min-w-0 items-center"
+            aria-label={siteName}
           >
-            {siteName}
+            {siteSettings.logoMediaId ? (
+              <img
+                src={`/media/${siteSettings.logoMediaId}`}
+                alt={siteName}
+                className="max-h-10 max-w-[220px] object-contain"
+              />
+            ) : (
+              <span className="text-lg font-bold tracking-tight">
+                {siteName}
+              </span>
+            )}
           </Link>
 
           <nav className="hidden items-center gap-5 md:flex">

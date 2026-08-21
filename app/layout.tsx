@@ -36,6 +36,12 @@ export async function generateMetadata(): Promise<Metadata> {
       settings.seoDefaultDescription ||
       settings.siteDescription ||
       undefined,
+    icons: settings.faviconMediaId
+      ? {
+          icon: `/media/${settings.faviconMediaId}`,
+          shortcut: `/media/${settings.faviconMediaId}`,
+        }
+      : undefined,
   };
 }
 

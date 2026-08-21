@@ -113,6 +113,18 @@ export async function saveSettingsAction(
       group: "social",
       isPublic: true,
     },
+    {
+      key: "branding.logoMediaId",
+      value: text(formData, "logoMediaId"),
+      group: "branding",
+      isPublic: true,
+    },
+    {
+      key: "branding.faviconMediaId",
+      value: text(formData, "faviconMediaId"),
+      group: "branding",
+      isPublic: true,
+    },
   ];
 
   await prisma.$transaction(

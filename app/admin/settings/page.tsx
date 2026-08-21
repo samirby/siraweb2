@@ -1,4 +1,5 @@
 import { requirePermission } from "@/lib/auth/permissions";
+import { prisma } from "@/lib/db/prisma";
 import { getSiteSettings } from "@/lib/settings/site-settings";
 import { saveSettingsAction } from "./actions";
 
@@ -16,7 +17,20 @@ export default async function SettingsAdminPage({
   await requirePermission("roles.manage");
 
   const query = await searchParams;
-  const settings = await getSiteSettings();
+
+  const [settings, images] = await Promise.all([
+    getSiteSettings(),
+    prisma.media.findMany({
+      where: { type: "IMAGE" },
+      orderBy: { createdAt: "desc" },
+      take: 100,
+      select: {
+        id: true,
+        originalName: true,
+        altText: true,
+      },
+    }),
+  ]);
 
   return (
     <main className="px-4 py-6 sm:px-6 lg:px-8">
@@ -87,6 +101,83 @@ export default async function SettingsAdminPage({
                 defaultValue={settings.siteDescription}
                 className="mt-2 w-full rounded-xl border border-zinc-300 px-4 py-3"
               />
+            </label>
+          </div>
+        </section>
+
+        <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="mb-5">
+            <h2 className="text-lg font-bold text-zinc-950">
+              Branding
+            </h2>
+            <p className="mt-1 text-sm text-zinc-500">
+              Choose logo and favicon from the existing Media Library.
+            </p>
+          </div>
+
+          <div className="grid gap-5 lg:grid-cols-2">
+            <label className="block">
+              <span className="text-sm font-semibold text-zinc-800">
+                Site logo
+              </span>
+
+              <select
+                name="logoMediaId"
+                defaultValue={settings.logoMediaId}
+                className="mt-2 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3"
+              >
+                <option value="">Use site name as text</option>
+                {images.map((image) => (
+                  <option
+                    key={image.id.toString()}
+                    value={image.id.toString()}
+                  >
+                    {image.altText || image.originalName}
+                  </option>
+                ))}
+              </select>
+
+              {settings.logoMediaId ? (
+                <div className="mt-3 flex h-16 items-center rounded-xl border border-zinc-200 bg-zinc-50 px-4">
+                  <img
+                    src={`/media/${settings.logoMediaId}`}
+                    alt="Current site logo"
+                    className="max-h-10 max-w-[220px] object-contain"
+                  />
+                </div>
+              ) : null}
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-semibold text-zinc-800">
+                Favicon
+              </span>
+
+              <select
+                name="faviconMediaId"
+                defaultValue={settings.faviconMediaId}
+                className="mt-2 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3"
+              >
+                <option value="">Use default favicon</option>
+                {images.map((image) => (
+                  <option
+                    key={image.id.toString()}
+                    value={image.id.toString()}
+                  >
+                    {image.altText || image.originalName}
+                  </option>
+                ))}
+              </select>
+
+              {settings.faviconMediaId ? (
+                <div className="mt-3 flex h-16 items-center rounded-xl border border-zinc-200 bg-zinc-50 px-4">
+                  <img
+                    src={`/media/${settings.faviconMediaId}`}
+                    alt="Current favicon"
+                    className="h-10 w-10 rounded object-contain"
+                  />
+                </div>
+              ) : null}
             </label>
           </div>
         </section>
