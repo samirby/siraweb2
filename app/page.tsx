@@ -6,6 +6,7 @@ import { PublicPostCard } from "@/app/_components/public/public-post-card";
 import { PublicShell } from "@/app/_components/public-shell";
 import { prisma } from "@/lib/db/prisma";
 import { getSiteSettings } from "@/lib/settings/site-settings";
+import { HomepagePostsSection } from "@/app/_components/public/homepage-posts-section";
 
 export const revalidate = 60;
 
@@ -260,7 +261,9 @@ export default async function Home() {
             </Link>
           </div>
         </section>
-      </main>
+            <HomepagePostsSection />
+
+</main>
     </PublicShell>
   );
 }

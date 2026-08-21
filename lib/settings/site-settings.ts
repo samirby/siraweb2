@@ -44,6 +44,17 @@ export type SiteSettings = {
   footerCopyrightText: string;
   footerCreditText: string;
   footerCreditUrl: string;
+  homePostsEnabled: string;
+  homePostsEyebrow: string;
+  homePostsTitle: string;
+  homePostsSubtitle: string;
+  homePostsCount: string;
+  homePostsLayout: string;
+  homePostsShowExcerpt: string;
+  homePostsShowCategory: string;
+  homePostsShowAuthor: string;
+  homePostsShowDate: string;
+  homePostsButtonText: string;
 };
 
 const defaults: SiteSettings = {
@@ -89,6 +100,17 @@ const defaults: SiteSettings = {
   footerCopyrightText: "",
   footerCreditText: "",
   footerCreditUrl: "",
+  homePostsEnabled: "true",
+  homePostsEyebrow: "Latest Articles",
+  homePostsTitle: "Fresh software news and trends",
+  homePostsSubtitle: "Explore the latest insights, updates, and best practices from the world of software and technology.",
+  homePostsCount: "4",
+  homePostsLayout: "grid4",
+  homePostsShowExcerpt: "true",
+  homePostsShowCategory: "true",
+  homePostsShowAuthor: "true",
+  homePostsShowDate: "true",
+  homePostsButtonText: "View all articles",
 };
 
 const settingMap = {
@@ -134,6 +156,17 @@ const settingMap = {
   "footer.copyrightText": "footerCopyrightText",
   "footer.creditText": "footerCreditText",
   "footer.creditUrl": "footerCreditUrl",
+  "homePosts.enabled": "homePostsEnabled",
+  "homePosts.eyebrow": "homePostsEyebrow",
+  "homePosts.title": "homePostsTitle",
+  "homePosts.subtitle": "homePostsSubtitle",
+  "homePosts.count": "homePostsCount",
+  "homePosts.layout": "homePostsLayout",
+  "homePosts.showExcerpt": "homePostsShowExcerpt",
+  "homePosts.showCategory": "homePostsShowCategory",
+  "homePosts.showAuthor": "homePostsShowAuthor",
+  "homePosts.showDate": "homePostsShowDate",
+  "homePosts.buttonText": "homePostsButtonText",
 } as const;
 
 async function loadSiteSettings(): Promise<SiteSettings> {
