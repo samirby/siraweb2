@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { PublicShell } from "@/app/_components/public-shell";
 import { prisma } from "@/lib/db/prisma";
+import { getSiteBaseUrl } from "@/lib/seo/site-url";
 
 export const dynamic = "force-dynamic";
 
@@ -33,16 +34,37 @@ export async function generateMetadata({
   params,
 }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const tag = await getTag(slug);
+
+  const [tag, baseUrl] = await Promise.all([
+    getTag(slug),
+    getSiteBaseUrl(),
+  ]);
 
   if (!tag) return {};
 
+  const title = tag.name;
+  const description = `Articles tagged ${tag.name}`;
+  const canonical = baseUrl
+    ? `${baseUrl}/tag/${tag.slug}`
+    : undefined;
+
   return {
-    title: tag.name,
-    description: `Articles tagged ${tag.name}`,
+    title,
+    description,
+    alternates: canonical ? { canonical } : undefined,
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      url: canonical,
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
   };
 }
-
 export default async function PublicTagPage({ params }: Props) {
   const { slug } = await params;
   const tag = await getTag(slug);

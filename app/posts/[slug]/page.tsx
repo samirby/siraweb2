@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { PublicShell } from "@/app/_components/public-shell";
 import { prisma } from "@/lib/db/prisma";
+import { getSiteBaseUrl } from "@/lib/seo/site-url";
 
 export const dynamic = "force-dynamic";
 
@@ -45,20 +46,34 @@ export async function generateMetadata({
   params,
 }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPublishedPost(slug);
+
+  const [post, baseUrl] = await Promise.all([
+    getPublishedPost(slug),
+    getSiteBaseUrl(),
+  ]);
 
   if (!post) return {};
 
+  const title = post.seoTitle || post.title;
+  const description =
+    post.seoDescription ||
+    post.excerpt ||
+    undefined;
+
+  const canonical =
+    post.canonicalUrl ||
+    (baseUrl ? `${baseUrl}/posts/${post.slug}` : undefined);
+
+  const image =
+    post.featuredMedia?.type === "IMAGE"
+      ? post.featuredMedia.url
+      : undefined;
+
   return {
-    title: post.seoTitle || post.title,
-    description:
-      post.seoDescription ||
-      post.excerpt ||
-      undefined,
-    alternates: post.canonicalUrl
-      ? {
-          canonical: post.canonicalUrl,
-        }
+    title,
+    description,
+    alternates: canonical
+      ? { canonical }
       : undefined,
     robots: post.noIndex
       ? {
@@ -66,6 +81,21 @@ export async function generateMetadata({
           follow: true,
         }
       : undefined,
+    openGraph: {
+      type: "article",
+      title,
+      description,
+      url: canonical,
+      publishedTime: post.publishedAt?.toISOString(),
+      modifiedTime: post.updatedAt.toISOString(),
+      images: image ? [image] : undefined,
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
   };
 }
 

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { PublicShell } from "@/app/_components/public-shell";
 import { prisma } from "@/lib/db/prisma";
+import { getSiteBaseUrl } from "@/lib/seo/site-url";
 
 export const dynamic = "force-dynamic";
 
@@ -30,19 +31,54 @@ export async function generateMetadata({
   params,
 }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const page = await getPublishedPage(slug);
+
+  const [page, baseUrl] = await Promise.all([
+    getPublishedPage(slug),
+    getSiteBaseUrl(),
+  ]);
 
   if (!page) return {};
 
+  const title = page.seoTitle || page.title;
+  const description =
+    page.seoDescription ||
+    page.excerpt ||
+    undefined;
+
+  const canonical =
+    page.canonicalUrl ||
+    (baseUrl ? `${baseUrl}/${page.slug}` : undefined);
+
+  const image =
+    page.featuredMedia?.type === "IMAGE"
+      ? page.featuredMedia.url
+      : undefined;
+
   return {
-    title: page.seoTitle || page.title,
-    description: page.seoDescription || page.excerpt || undefined,
-    alternates: page.canonicalUrl
-      ? { canonical: page.canonicalUrl }
+    title,
+    description,
+    alternates: canonical
+      ? { canonical }
       : undefined,
     robots: page.noIndex
-      ? { index: false, follow: true }
+      ? {
+          index: false,
+          follow: true,
+        }
       : undefined,
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      url: canonical,
+      images: image ? [image] : undefined,
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
   };
 }
 

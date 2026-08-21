@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { PublicShell } from "@/app/_components/public-shell";
 import { prisma } from "@/lib/db/prisma";
+import { getSiteBaseUrl } from "@/lib/seo/site-url";
 
 export const dynamic = "force-dynamic";
 
@@ -43,16 +44,40 @@ export async function generateMetadata({
   params,
 }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const category = await getCategory(slug);
+
+  const [category, baseUrl] = await Promise.all([
+    getCategory(slug),
+    getSiteBaseUrl(),
+  ]);
 
   if (!category) return {};
 
+  const title = category.name;
+  const description =
+    category.description ||
+    `Articles in ${category.name}`;
+
+  const canonical = baseUrl
+    ? `${baseUrl}/category/${category.slug}`
+    : undefined;
+
   return {
-    title: category.name,
-    description: `Articles in ${category.name}`,
+    title,
+    description,
+    alternates: canonical ? { canonical } : undefined,
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      url: canonical,
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
   };
 }
-
 export default async function CategoryPublicPage({
   params,
 }: Props) {

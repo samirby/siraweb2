@@ -42,6 +42,24 @@ export async function generateMetadata(): Promise<Metadata> {
           shortcut: `/media/${settings.faviconMediaId}`,
         }
       : undefined,
+    openGraph: {
+      type: "website",
+      siteName: settings.siteName,
+      title: settings.seoDefaultTitle || settings.siteName,
+      description:
+        settings.seoDefaultDescription ||
+        settings.siteDescription ||
+        undefined,
+      url: settings.siteUrl || undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: settings.seoDefaultTitle || settings.siteName,
+      description:
+        settings.seoDefaultDescription ||
+        settings.siteDescription ||
+        undefined,
+    },
   };
 }
 

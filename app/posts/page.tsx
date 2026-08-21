@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { PublicShell } from "@/app/_components/public-shell";
 import { prisma } from "@/lib/db/prisma";
+import { getSiteBaseUrl } from "@/lib/seo/site-url";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +25,43 @@ function safePage(value?: string) {
 
 function normalize(value: string | null | undefined) {
   return (value ?? "").trim().toLocaleLowerCase();
+}
+
+export async function generateMetadata({
+  searchParams,
+}: Props): Promise<Metadata> {
+  const query = await searchParams;
+  const baseUrl = await getSiteBaseUrl();
+
+  const hasFilters =
+    Boolean((query.q ?? "").trim()) ||
+    Boolean((query.category ?? "").trim()) ||
+    Boolean((query.tag ?? "").trim()) ||
+    safePage(query.page) > 1;
+
+  const canonical = baseUrl ? `${baseUrl}/posts` : undefined;
+  const title = "Posts";
+  const description = "Browse published articles.";
+
+  return {
+    title,
+    description,
+    alternates: canonical ? { canonical } : undefined,
+    robots: hasFilters
+      ? { index: false, follow: true }
+      : undefined,
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      url: canonical,
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+  };
 }
 
 export default async function PublicPostsPage({
