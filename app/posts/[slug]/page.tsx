@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import Image from "next/image";
@@ -119,6 +120,49 @@ export default async function PublicPost({
     notFound();
   }
 
+  const [relatedPosts, adjacentPosts] = await Promise.all([
+    prisma.post.findMany({
+      where: {
+        id: { not: post.id },
+        status: "PUBLISHED",
+        categoryId: post.categoryId,
+        OR: [
+          { publishedAt: null },
+          { publishedAt: { lte: new Date() } },
+        ],
+      },
+      orderBy: [
+        { publishedAt: "desc" },
+        { createdAt: "desc" },
+      ],
+      take: 3,
+      include: {
+        author: { select: { name: true } },
+        category: true,
+        featuredMedia: true,
+      },
+    }),
+    prisma.post.findMany({
+      where: {
+        id: { not: post.id },
+        status: "PUBLISHED",
+        OR: [
+          { publishedAt: null },
+          { publishedAt: { lte: new Date() } },
+        ],
+      },
+      orderBy: [
+        { publishedAt: "desc" },
+        { createdAt: "desc" },
+      ],
+      take: 2,
+      select: {
+        slug: true,
+        title: true,
+      },
+    }),
+  ]);
+
   const canonical =
     post.canonicalUrl ||
     (baseUrl ? `${baseUrl}/posts/${post.slug}` : undefined);
@@ -170,9 +214,18 @@ export default async function PublicPost({
       <main className="min-h-[70vh] bg-white">
         <article>
           <header className="mx-auto max-w-4xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-              {post.category?.name ?? "Article"}
-            </p>
+            {post.category ? (
+              <Link
+                href={`/category/${post.category.slug}`}
+                className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 transition hover:text-zinc-950"
+              >
+                {post.category.name}
+              </Link>
+            ) : (
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                Article
+              </p>
+            )}
 
             <h1 className="mt-3 text-4xl font-bold tracking-tight text-zinc-950 sm:text-6xl">
               {post.title}
@@ -199,14 +252,14 @@ export default async function PublicPost({
           </header>
 
           {post.featuredMedia?.type === "IMAGE" ? (
-            <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
               <div className="relative aspect-[16/9] overflow-hidden rounded-3xl">
                 <Image
                   src={post.featuredMedia.url}
                   alt={post.featuredMedia.altText || post.title}
                   fill
                   priority
-                  sizes="(max-width: 1024px) 100vw, 960px"
+                  sizes="(max-width: 1024px) 100vw, 896px"
                   className="object-cover"
                 />
               </div>
@@ -216,7 +269,7 @@ export default async function PublicPost({
           <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
             {post.content ? (
               <div
-                className="rich-post-content text-base leading-8 text-zinc-700"
+                className="rich-post-content public-prose text-base leading-8 text-zinc-700"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeRichHtml(post.content),
                 }}
@@ -250,6 +303,40 @@ export default async function PublicPost({
               )
             ) : null}
 
+            {canonical ? (
+              <section className="mt-12 border-t border-zinc-200 pt-8">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-400">
+                  Share article
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <a
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(canonical)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="public-button-secondary"
+                  >
+                    Facebook
+                  </a>
+                  <a
+                    href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(canonical)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="public-button-secondary"
+                  >
+                    LinkedIn
+                  </a>
+                  <a
+                    href={`https://x.com/intent/post?url=${encodeURIComponent(canonical)}&text=${encodeURIComponent(post.title)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="public-button-secondary"
+                  >
+                    X
+                  </a>
+                </div>
+              </section>
+            ) : null}
+
             {post.gallery.length ? (
               <section className="mt-14 border-t border-zinc-200 pt-10">
                 <h2 className="text-2xl font-bold text-zinc-950">
@@ -273,6 +360,64 @@ export default async function PublicPost({
                   ))}
                 </div>
               </section>
+            ) : null}
+          </div>
+
+          <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+            {relatedPosts.length ? (
+              <section className="border-t border-zinc-200 pt-12">
+                <div className="public-section-heading">
+                  <div>
+                    <p className="public-eyebrow">Keep reading</p>
+                    <h2 className="public-section-title">
+                      Related articles
+                    </h2>
+                  </div>
+                </div>
+
+                <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {relatedPosts.map((item) => (
+                    <article
+                      key={item.id.toString()}
+                      className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm"
+                    >
+                      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                        {item.category?.name ?? "Article"}
+                      </p>
+                      <Link
+                        href={`/posts/${item.slug}`}
+                        className="mt-2 block text-lg font-bold text-zinc-950 hover:underline"
+                      >
+                        {item.title}
+                      </Link>
+                      {item.excerpt ? (
+                        <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-600">
+                          {item.excerpt}
+                        </p>
+                      ) : null}
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
+            {adjacentPosts.length ? (
+              <nav className="mt-10 grid gap-3 sm:grid-cols-2">
+                {adjacentPosts.map((item) => (
+                  <Link
+                    key={item.slug}
+                    href={`/posts/${item.slug}`}
+                    className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 transition hover:border-zinc-300 hover:bg-white"
+                  >
+                    <span className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                      Another article
+                    </span>
+                    <span className="mt-1 block font-bold text-zinc-950">
+                      {item.title}
+                    </span>
+                  </Link>
+                ))}
+              </nav>
             ) : null}
           </div>
         </article>

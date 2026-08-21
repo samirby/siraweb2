@@ -63,7 +63,7 @@ const getPublicMenus = unstable_cache(
       id: menu.id.toString(),
       items: menu.items.map((item) => ({
         ...item,
-        id: item.id,
+        id: item.id.toString(),
         menuId: item.menuId.toString(),
         parentId: item.parentId?.toString() ?? null,
         pageId: item.pageId?.toString() ?? null,
@@ -116,7 +116,7 @@ export async function PublicShell({
     })) ?? [];
 
   return (
-    <div className="min-h-screen bg-white text-zinc-950">
+    <div className="min-h-screen bg-white text-zinc-950 selection:bg-zinc-950 selection:text-white">
       {secondaryMenu?.items.length ? (
         <div className="hidden border-b border-zinc-800 bg-zinc-950 text-zinc-300 md:block">
           <div className="mx-auto flex min-h-9 max-w-7xl items-center justify-end gap-4 px-4 text-xs sm:px-6 lg:px-8">
@@ -134,8 +134,8 @@ export async function PublicShell({
         </div>
       ) : null}
 
-      <header className="sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-white/90 backdrop-blur-xl">
+        <div className="mx-auto flex min-h-[4.5rem] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <Link
             href="/"
             className="flex min-w-0 items-center"
@@ -157,18 +157,27 @@ export async function PublicShell({
             )}
           </Link>
 
-          <nav className="hidden items-center gap-5 md:flex">
-            {topMenu?.items.map((item) => (
-              <Link
-                key={String(item.id)}
-                href={itemHref(item)}
-                target={item.openInNewTab ? "_blank" : undefined}
-                className="text-sm font-medium text-zinc-600 transition hover:text-zinc-950"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+          <div className="hidden items-center gap-5 md:flex">
+            <nav className="flex items-center gap-5">
+              {topMenu?.items.map((item) => (
+                <Link
+                  key={String(item.id)}
+                  href={itemHref(item)}
+                  target={item.openInNewTab ? "_blank" : undefined}
+                  className="text-sm font-semibold text-zinc-600 transition hover:text-zinc-950"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+
+            <Link
+              href="/contact"
+              className="rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-800"
+            >
+              Contact
+            </Link>
+          </div>
 
           <PublicMobileNav
             siteName={siteName}

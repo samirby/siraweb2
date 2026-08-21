@@ -184,9 +184,12 @@ export default async function PublicPage({
                         {post.category?.name ?? "Article"}
                       </p>
 
-                      <h2 className="mt-2 text-xl font-bold text-zinc-950">
+                      <a
+                        href={`/posts/${post.slug}`}
+                        className="mt-2 block text-xl font-bold text-zinc-950 transition hover:text-zinc-600"
+                      >
                         {post.title}
-                      </h2>
+                      </a>
 
                       {post.excerpt ? (
                         <p className="mt-3 line-clamp-3 text-sm leading-6 text-zinc-600">
@@ -206,7 +209,7 @@ export default async function PublicPage({
         ) : (
           <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
             {page.content ? (
-              <div className="whitespace-pre-line text-base leading-8 text-zinc-700">
+              <div className="public-prose whitespace-pre-line text-base leading-8 text-zinc-700">
                 {page.content}
               </div>
             ) : (

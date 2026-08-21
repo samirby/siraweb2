@@ -54,7 +54,8 @@ export function PublicMobileNav({
     };
   }, [open]);
 
-  const drawer = createPortal(
+  const drawer = typeof document !== "undefined"
+    ? createPortal(
         <div
           className={`fixed inset-0 z-[9999] transition-[visibility] duration-200 md:hidden ${
             open ? "visible" : "invisible"
@@ -136,7 +137,8 @@ export function PublicMobileNav({
           </aside>
         </div>,
         document.body,
-      );
+      )
+    : null;
 
   return (
     <>
