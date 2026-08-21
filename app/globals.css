@@ -376,3 +376,115 @@ textarea {
 .sira-footer[data-footer-style="minimal"] a {
   color: #18181b;
 }
+
+
+/* === SIRA Homepage Posts Layout 1 === */
+
+.sira-home-posts {
+  background:
+    radial-gradient(circle at 10% 8%, rgba(255,255,255,0.06), transparent 26%),
+    radial-gradient(circle at 90% 92%, rgba(255,255,255,0.04), transparent 22%),
+    linear-gradient(135deg, #430d31 0%, #2b0b21 46%, #12070f 100%);
+  color: #ffffff;
+}
+
+.sira-home-posts-eyebrow {
+  margin: 0;
+  color: #f58aad;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.sira-home-posts-title {
+  margin-top: 0.75rem;
+  max-width: 760px;
+  color: #ffffff;
+  font-size: clamp(2.4rem, 5vw, 4.7rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+.sira-home-posts-subtitle {
+  margin-top: 1.25rem;
+  max-width: 680px;
+  color: rgba(255,255,255,0.72);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.sira-home-posts-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  flex-shrink: 0;
+  border-radius: 0.8rem;
+  background: linear-gradient(135deg, #be3f6d 0%, #d65b82 100%);
+  padding: 0.95rem 1.25rem;
+  color: #ffffff !important;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 14px 34px rgba(190,63,109,0.24);
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+.sira-home-posts-cta:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.sira-home-post-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(245,138,173,0.28);
+  border-radius: 1.05rem;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.035),
+    rgba(255,255,255,0.012)
+  );
+  box-shadow: 0 22px 48px rgba(0,0,0,0.13);
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.sira-home-post-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(245,138,173,0.52);
+  box-shadow: 0 28px 58px rgba(0,0,0,0.18);
+}
+
+.sira-home-post-card > a:first-child {
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sira-home-post-category {
+  margin: 0;
+  color: #f58aad;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sira-home-post-card a {
+  text-decoration: none;
+}
+
+@media (max-width: 639px) {
+  .sira-home-posts-title {
+    font-size: 2.55rem;
+  }
+
+  .sira-home-posts-subtitle {
+    font-size: 0.95rem;
+  }
+}
